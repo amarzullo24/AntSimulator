@@ -2,6 +2,7 @@ package com.antSimulator.logic;
 
 public class GroundState {
 
+	public static final int MAXLEVEL = 10;
 	private int level;
 	private float phLevel;
 
@@ -9,11 +10,11 @@ public class GroundState {
 	
 	public GroundState(int l) {
 		setLevel(l);
-		phLevel=0;
+		setPhLevel(0);
 	}
 	
 	public void increasePh(){
-		phLevel+=constPh;
+		setPhLevel(getPhLevel() + constPh);
 	}
 
 	public int getLevel() {
@@ -22,5 +23,13 @@ public class GroundState {
 
 	public void setLevel(int level) {
 		this.level = level;
+	}
+
+	public float getPhLevel() {
+		return phLevel;
+	}
+
+	public void setPhLevel(float phLevel) {
+		this.phLevel = phLevel;
 	}
 }

@@ -1,0 +1,17 @@
+#VerticalBox{
+	-fx-background-color: white;
+    -fx-border-color: black;
+    -fx-background-radius: 100.0;
+  
+}
+
+#button .text{
+	-fx-effect: dropshadow(one-pass-box , white, 0, 1 , 0, 1);
+}
+#paintComponent{
+	-fx-background-color: white;
+    -fx-border-color: black;
+    -width: 300;
+    
+}
+

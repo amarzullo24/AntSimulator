@@ -1,0 +1,75 @@
+#mainLayout{
+	-fx-background-color: gray;
+    -fx-border-color: black;
+}
+
+#leftLayout{
+	-fx-background-color: #000080;
+    -fx-border-color: black;
+}
+
+#rightLayout{
+	-fx-background-color: #408080;
+    -fx-border-color: black;
+}
+
+#labelright{
+	-fx-text-fill: #d3d3d3; 
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.75) , 0, 0.0 , 0 , -1 );
+}
+
+#buttonl{
+	-fx-padding: 5;
+    -fx-border-image-source: url("left-btn.png");
+    -fx-border-image-slice: 4 4 4 4 fill;
+    -fx-border-image-width: 4 4 4 4;
+    -fx-border-image-insets: 0;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: null !important; 
+}
+#buttonl:selected { -fx-border-image-source: url("left-btn-selected.png"); }
+#buttonl .label {
+    -fx-text-fill: #d3d3d3; 
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.75) , 0, 0.0 , 0 , -1 );
+}
+#buttonl:selected .label {
+   /* -fx-text-fill: black; */
+   -fx-text-fill: white;
+    -fx-effect: dropshadow( one-pass-box , white , 0, 0.0 , 0 , 1 );
+}
+#buttonc {
+    -fx-padding: 5;
+    -fx-border-image-source: url("center-btn.png");
+    -fx-border-image-slice: 4 4 4 4 fill;
+    -fx-border-image-width: 4 4 4 4;
+    -fx-border-image-insets: 0;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: null !important;
+}
+#buttonc:selected { -fx-border-image-source: url("center-btn-selected.png"); }
+#buttonc .label {
+    -fx-text-fill: #d3d3d3;
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.75) , 0, 0.0 , 0 , -1 );
+}
+#buttonc:selected .label {
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( one-pass-box , white , 0, 0.0 , 0 , 1 );
+}
+#buttonr {
+    -fx-padding: 5;
+    -fx-border-image-source: url("right-btn.png");
+    -fx-border-image-slice: 4 4 4 4 fill;
+    -fx-border-image-width: 4 4 4 4;
+    -fx-border-image-insets: 0;
+    -fx-border-image-repeat: stretch;
+    -fx-background-color: null !important;
+}
+#buttonr:selected { -fx-border-image-source: url("right-btn-selected.png"); }
+#buttonr .label {
+    -fx-text-fill: #d3d3d3;
+    -fx-effect: dropshadow( one-pass-box , rgba(0,0,0,0.75) , 0, 0.0 , 0 , -1 );
+}
+#buttonr:selected .label {
+    -fx-text-fill: black;
+    -fx-effect: dropshadow( one-pass-box , white , 0, 0.0 , 0 , 1 );
+}

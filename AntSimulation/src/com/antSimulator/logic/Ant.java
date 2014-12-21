@@ -1,5 +1,6 @@
 package com.antSimulator.logic;
 
+import java.awt.Point;
 import java.util.Random;
 
 public class Ant {
@@ -11,21 +12,70 @@ public class Ant {
 	
 	public static final int SEARCH=5;
 	public static final int FOUND=6;
+	public static final int PHRELEASE = 7;
 	
 	private int direction;
 	private int antState;
 	private int level;
+	private Point position;
+	private String name;
  
-	public Ant(int nestLevel) {
-		direction=chooseDir();
-		antState=SEARCH;
-		level=nestLevel;
+	public Ant(int nestLevel, Point pos, int num) {
+		setDirection(-1);
+		setAntState(SEARCH);
+		setLevel(nestLevel);
+		position=pos;
+		name="Ant".concat(String.valueOf(num));
+		
+	}
+
+	public int getDirection() {
+		return direction;
+	}
+
+	public void setDirection(int direction) {
+		this.direction = direction;
 	}
 	
-	public int chooseDir(){
-		// modificare
-		Random r=new Random(4);
-		int d=r.nextInt();
-		return d;
+	public void setXPos(int x){
+		position.x=x;
+		
 	}
+	
+	public void setYPos(int y){
+		position.y=y;
+	}
+	
+	public double getXPos(){
+		return position.getX();
+	}
+	
+	public double getYPos(){
+		return position.getY();
+	}
+
+	public int getLevel() {
+		return level;
+	}
+
+	public void setLevel(int level) {
+		this.level = level;
+	}
+
+	public int getAntState() {
+		return antState;
+	}
+
+	public void setAntState(int antState) {
+		this.antState = antState;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+	
 }
