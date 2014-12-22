@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Manager {
 
 	public static final int NUMBCORE = 2;
+	public static boolean ISACTIVE = true;
 
 	public World world;
 	Lock lock = new ReentrantLock();

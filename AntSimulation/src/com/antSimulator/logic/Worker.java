@@ -1,6 +1,5 @@
 package com.antSimulator.logic;
 
-import java.util.Random;
 import java.util.concurrent.BlockingQueue;
 
 public class Worker extends Thread {
@@ -14,8 +13,8 @@ public class Worker extends Thread {
 	@Override
 	public void run() {
 		try {
-			while (true) {
-				
+			while (Manager.ISACTIVE) {
+
 				Ant a = ants.take();
 				
 				Manager.getInstance().moveAnt(a);
