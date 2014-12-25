@@ -21,7 +21,7 @@ public class World {
 	private int height;
 
 	public World() {
-		
+
 		loadWorld();
 		spawnAnts();
 
@@ -44,7 +44,7 @@ public class World {
 
 	private void loadWorld() {
 		setWidth(300);
-		height=300;
+		height = 300;
 		matrix=new Cell[getWidth()][height];
 		lockedCell=new boolean[width][height];
 		initWorld();
@@ -58,12 +58,12 @@ public class World {
 	private void initWorld() {
 		for (int i = 0; i < width; i++) {
 			for (int j = 0; j < height; j++) {
-				matrix[i][j]=new Cell(i, j,new Random().nextInt(GroundState.MAXLEVEL+1));
+				matrix[i][j]=new Cell(i, j,new Random().nextInt(GroundState.MAXLEVEL + 1));
 				lockedCell[i][j]=false;
 			}
 		}
-		
-		
+
+
 	}
 
 	public Cell[][] getWorld() {
@@ -74,17 +74,20 @@ public class World {
 		this.matrix = world;
 	}
 
-	
+
 	public Cell getAvailableCell(int xPos, int yPos) {
-		  
-		if (xPos < 0 || xPos > getWidth() || yPos < 0 || yPos > height || matrix[xPos][yPos].getG().getLevel()==GroundState.MAXLEVEL)
+
+		if (xPos < 0 || xPos >= getWidth() || yPos < 0 || yPos >= height)
+			return null;
+		else if (matrix[xPos][yPos].getG().getLevel() == GroundState.MAXLEVEL)
 			return null;
 		else
 			return matrix[xPos][yPos];
 	}
 
 	public Cell getCell(int xPos, int yPos) {
-		if (xPos < 0 || xPos > getWidth() || yPos < 0 || yPos > height)
+		
+		if (xPos < 0 || xPos >= getWidth() || yPos < 0 || yPos >= height)
 			return null;
 		else
 			return matrix[xPos][yPos];
@@ -99,28 +102,46 @@ public class World {
 	}
 	public void unlockCell(int x,int y, int nx, int ny){
 		Manager.getInstance().lock.lock();
-		lockedCell[x][y] = false;
-		lockedCell[nx][ny] = false;
-		Manager.getInstance().condition.signalAll();
-	Manager.getInstance().lock.unlock();
+		try{
+
+			lockedCell[x][y] = false;
+			lockedCell[nx][ny] = false;
+
+			Manager.getInstance().condition.signalAll();
+
+		}
+		finally{
+			Manager.getInstance().lock.unlock();
+		}
 	}
+
+
+
 	public void lockCell(int x,int y, int nx, int ny){
+
 		Manager.getInstance().lock.lock();
-		
-		while(lockedCell[x][y] && lockedCell[nx][ny])
-			try {
-				Manager.getInstance().condition.signalAll();
-				Manager.getInstance().condition.await();
-				
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-		lockedCell[x][y]=true;
-		Manager.getInstance().lock.unlock();
-		
-		
-		
+		try{
+
+			while(lockedCell[x][y] && lockedCell[nx][ny])
+				try {
+					
+					Manager.getInstance().condition.signalAll();
+					Manager.getInstance().condition.await();
+
+				} catch (InterruptedException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
+
+			lockedCell[x][y]=true;
+			lockedCell[nx][ny]=true;
+
+		}
+		finally{
+			Manager.getInstance().lock.unlock();
+		}
+
+
 	}
 
 	public int getWidth() {

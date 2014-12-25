@@ -1,5 +1,7 @@
 package com.antSimulator.gui;
 
+import java.util.Random;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -120,6 +122,7 @@ public class AntPanel extends Application {
 
 		gc.clearRect(0, 0, 900, 900);
 
+		Manager.getInstance().lock.lock();
 		for (int i = 0; i < world.getWidth(); i++) {
 			for (int j = 0; j < world.getHeight(); j++) {
 				Cell c = world.getCell(i, j);
@@ -145,8 +148,7 @@ public class AntPanel extends Application {
 			}//for
 
 		}//for
-
-
+		Manager.getInstance().lock.unlock();
 	}//repaint
 
 }//class

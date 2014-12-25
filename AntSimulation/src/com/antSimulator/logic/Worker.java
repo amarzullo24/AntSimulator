@@ -18,10 +18,21 @@ public class Worker extends Thread {
 				Ant a = ants.take();
 				
 				Manager.getInstance().moveAnt(a);
+				
 				ants.put(a);
+				sleepQuietly(10);
 			}
 		} catch (InterruptedException e) {
-			// TODO Auto-generated catch block
+			
+			e.printStackTrace();
+		}
+	}
+	
+	private void sleepQuietly(int time){
+		
+		try {
+			Thread.sleep(time);
+		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}
 	}
