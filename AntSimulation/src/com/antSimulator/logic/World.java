@@ -8,17 +8,15 @@ import java.util.concurrent.BlockingQueue;
 public class World {
 
 
-	public static final int NUMBANT=20;
-	public static final int WIDTH=300;
-	public static final int HEIGHT=300;
+	public static final int NUM_OF_ANTS = 50;
+	public static final int WIDTH = 200;
+	public static final int HEIGHT = 200;
 	private Cell[][] matrix;
 	private boolean[][] lockedCell;
 	private BlockingQueue<Ant> ants;
 	private Point nest;
 	private int nestlevel;
 	private Point food;
-	private int width;
-	private int height;
 
 	public World() {
 
@@ -28,25 +26,24 @@ public class World {
 	}
 
 	private void spawnAnts() {
-		ants = new ArrayBlockingQueue<Ant>(100);
+		ants = new ArrayBlockingQueue<Ant>(NUM_OF_ANTS + 1);
 
-		for (int i = 0; i < NUMBANT; i++)
+		for (int i = 0; i < NUM_OF_ANTS; i++)
 			try {
-				Ant a=new Ant(nestlevel, nest,i+1);
+				
+				Ant a=new Ant(nestlevel, (Point) nest.clone(),i+1);
 				ants.put(a);
-				matrix[nest.x][nest.y].setA(a);
+				
 			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 
 	}
 
 	private void loadWorld() {
-		setWidth(300);
-		height = 300;
-		matrix=new Cell[getWidth()][height];
-		lockedCell=new boolean[width][height];
+		
+		matrix=new Cell[WIDTH][HEIGHT];
+		lockedCell=new boolean[WIDTH][HEIGHT];
 		initWorld();
 
 		nest = new Point(5, 5);
@@ -56,11 +53,19 @@ public class World {
 	}
 
 	private void initWorld() {
-		for (int i = 0; i < width; i++) {
-			for (int j = 0; j < height; j++) {
-				matrix[i][j]=new Cell(i, j,new Random().nextInt(GroundState.MAXLEVEL + 1));
+		for (int i = 0; i < WIDTH; i++) {
+			for (int j = 0; j < HEIGHT; j++) {
+				matrix[i][j]=new Cell(i, j,new Random().nextInt(GroundState.MAXLEVEL));
 				lockedCell[i][j]=false;
 			}
+		}
+		
+		
+		for (int k = 0; k < 500; k++) {
+			
+			int i = new Random().nextInt(HEIGHT);
+			int j = new Random().nextInt(WIDTH);
+			matrix[i][j] = new Cell(i, j, GroundState.MAXLEVEL);
 		}
 
 
@@ -77,7 +82,7 @@ public class World {
 
 	public Cell getAvailableCell(int xPos, int yPos) {
 
-		if (xPos < 0 || xPos >= getWidth() || yPos < 0 || yPos >= height)
+		if (xPos < 0 || xPos >= WIDTH || yPos < 0 || yPos >= HEIGHT)
 			return null;
 		else if (matrix[xPos][yPos].getG().getLevel() == GroundState.MAXLEVEL)
 			return null;
@@ -87,7 +92,7 @@ public class World {
 
 	public Cell getCell(int xPos, int yPos) {
 		
-		if (xPos < 0 || xPos >= getWidth() || yPos < 0 || yPos >= height)
+		if (xPos < 0 || xPos >= WIDTH || yPos < 0 || yPos >= HEIGHT)
 			return null;
 		else
 			return matrix[xPos][yPos];
@@ -129,7 +134,7 @@ public class World {
 					Manager.getInstance().condition.await();
 
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
+					
 					e.printStackTrace();
 				}
 
@@ -144,22 +149,6 @@ public class World {
 
 	}
 
-	public int getWidth() {
-		return width;
-	}
-
-	public void setWidth(int width) {
-		this.width = width;
-	}
-
-	public int getHeight() {
-		return height;
-	}
-
-	public void setHeight(int height) {
-		this.height = height;
-	}
-
 	public BlockingQueue<Ant> getAnts() {
 		return ants;
 	}
@@ -167,5 +156,10 @@ public class World {
 	public void setAnts(BlockingQueue<Ant> ants) {
 		this.ants = ants;
 	}
+	
+	public void setCell(Cell cell){
+		this.matrix[cell.getX()][cell.getY()] = cell;
+	}
+	
 
 }

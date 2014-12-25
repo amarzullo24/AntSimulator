@@ -2,7 +2,7 @@ package com.antSimulator.logic;
 
 public class GroundState {
 
-	public static final int MAXLEVEL = 10;
+	public static final int MAXLEVEL = 2;
 	private int level;
 	private float phLevel;
 

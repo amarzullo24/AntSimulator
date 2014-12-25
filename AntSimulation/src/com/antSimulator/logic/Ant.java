@@ -1,17 +1,16 @@
 package com.antSimulator.logic;
 
 import java.awt.Point;
-import java.util.Random;
 
 public class Ant {
 
-	public static final int UP=0;
-	public static final int DOWN=1;
-	public static final int LEFT=2;
-	public static final int RIGHT=3;
+	public static final int UP = 0;
+	public static final int DOWN = 1;
+	public static final int LEFT = 2;
+	public static final int RIGHT = 3;
 	
-	public static final int SEARCH=5;
-	public static final int FOUND=6;
+	public static final int SEARCH = 5;
+	public static final int FOUND = 6;
 	public static final int PHRELEASE = 7;
 	
 	private int direction;
@@ -27,6 +26,15 @@ public class Ant {
 		position=pos;
 		name="Ant".concat(String.valueOf(num));
 		
+	}
+	
+	public Ant(Ant ant){
+		
+		this.direction = ant.direction;
+		this.antState = ant.antState;
+		this.setLevel(ant.getLevel());
+		this.position = ant.position;
+		this.name = ant.name;
 	}
 
 	public int getDirection() {

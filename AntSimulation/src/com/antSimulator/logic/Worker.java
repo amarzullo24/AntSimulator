@@ -18,9 +18,9 @@ public class Worker extends Thread {
 				Ant a = ants.take();
 				
 				Manager.getInstance().moveAnt(a);
-				
+	
 				ants.put(a);
-				sleepQuietly(10);
+				sleepQuietly(Manager.SLEEP_TIME);
 			}
 		} catch (InterruptedException e) {
 			

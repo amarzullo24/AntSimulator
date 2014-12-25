@@ -7,10 +7,12 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+
 public class Manager {
 
-	public static final int NUMBCORE = 2;
+	public static final int CORE_NUMBER = 4;
 	public static boolean ISACTIVE = true;
+	public static final int SLEEP_TIME = 10;
 
 	public World world;
 	public Lock lock = new ReentrantLock();
@@ -29,7 +31,7 @@ public class Manager {
 	public void start() {
 
 		world = loadWorld();
-		for (int i = 0; i < NUMBCORE; i++) {
+		for (int i = 0; i < CORE_NUMBER; i++) {
 			workers.add(new Worker(world.getAnts()));
 			workers.get(i).start();
 		}
@@ -39,7 +41,7 @@ public class Manager {
 		return new World();
 	}
 
-	
+
 	public void moveAnt(Ant a) throws InterruptedException {
 
 		ArrayList<Integer> dir = new ArrayList<Integer>();
@@ -53,7 +55,7 @@ public class Manager {
 
 			int k = new Random().nextInt(dir.size());
 			Cell currentChoise = world.getCell((int) a.getXPos(),(int) a.getYPos());
-			
+
 			switch (dir.get(k)) {
 			case Ant.UP:
 				currentChoise=world.getCell((int) a.getXPos(), (int) a.getYPos() - 1);
@@ -93,11 +95,11 @@ public class Manager {
 		int y = (int) a.getYPos();
 		int nx = currentChoise.getX();
 		int ny = currentChoise.getY();
-		
+
 		world.lockCell(x, y, nx, ny);
 
-		currentChoise = world.getAvailableCell((int) a.getXPos() + dx,
-				(int) (a.getYPos() + dy));
+		currentChoise = world.getAvailableCell((int) a.getXPos() + dx,(int) (a.getYPos() + dy));
+
 		if (currentChoise != null) {
 			check = true;
 			transaction(a, currentChoise);
@@ -108,24 +110,25 @@ public class Manager {
 		return check;
 	}
 
-	private void transaction(Ant a, Cell currentChoise) {
-		
-		//Cell current = world.getCell((int) a.getXPos(), (int) a.getYPos());
-		Cell current = new Cell((int) a.getXPos(), (int) a.getYPos(), a.getLevel());
-		
-		if (currentChoise.getA() == null) {
-			
-			current.setA(null);
-			if (a.getLevel() == currentChoise.getG().getLevel()) {
-				
-				currentChoise.setA(a);
-				a.setXPos(currentChoise.getX());
-				a.setYPos(currentChoise.getY());
-				
-				// if(a.getAntState()==Ant.FOUND)
-				current.getG().setPhLevel(current.getG().getPhLevel() + Ant.PHRELEASE);
-				
-			} else if (a.getLevel() < currentChoise.getG().getLevel())
+	private void transaction(Ant a, Cell whereGo) {
+
+		Cell current = world.getCell((int) a.getXPos(), (int) a.getYPos());
+
+		if (whereGo.getA() == null) {
+
+			if (a.getLevel() == whereGo.getG().getLevel()) {
+
+
+				a.setXPos(whereGo.getX());
+				a.setYPos(whereGo.getY());
+
+				if(a.getAntState()==Ant.FOUND)
+					current.getG().setPhLevel(current.getG().getPhLevel() + Ant.PHRELEASE);
+
+				whereGo.setA(a);
+				current.setA(null);
+			} 
+			else if (a.getLevel() < whereGo.getG().getLevel())
 				a.setLevel(a.getLevel() + 1);
 			else
 				a.setLevel(a.getLevel() - 1);

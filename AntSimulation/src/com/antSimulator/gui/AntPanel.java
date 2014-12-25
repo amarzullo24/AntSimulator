@@ -1,7 +1,5 @@
 package com.antSimulator.gui;
 
-import java.util.Random;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -11,7 +9,6 @@ import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
 import javafx.scene.paint.Color;
-import javafx.scene.shape.Rectangle;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
@@ -22,11 +19,11 @@ import com.antSimulator.logic.World;
 
 public class AntPanel extends Application {
 
-	public static final int CELLSIZE = 3;
+	public static final int CELLSIZE = 4;
+	public static final int PANEL_SIZE = 500;
+	
 	private World world;
 	private Group root;
-	private Group group;
-	private Scene sc;
 	private Stage stage;
 	private Canvas canvas;
 	private GraphicsContext gc;
@@ -53,11 +50,9 @@ public class AntPanel extends Application {
 
 		this.stage.setTitle("AntSimulator!");
 		this.root = new Group();
-		this.canvas = new Canvas(900, 900);
+		this.canvas = new Canvas(PANEL_SIZE, PANEL_SIZE);
 		this.gc = canvas.getGraphicsContext2D();
 
-		//draws the logical matrix on a canvas object
-		//repaint();
 
 		//inits the repainter thread
 		initThread();
@@ -81,22 +76,7 @@ public class AntPanel extends Application {
 	}
 
 	private void initThread(){
-//		Platform.runLater(new Runnable() {
-//
-//			@Override
-//			public void run() {
-//
-//				while(true){
-//					repaint();
-//					try {
-//						Thread.sleep(500);
-//					} catch (InterruptedException e) {
-//						// TODO Auto-generated catch block
-//						e.printStackTrace();
-//					}
-//				}
-//			}
-//		});
+
 		
 		new AnimationTimer() {
 			
@@ -104,7 +84,7 @@ public class AntPanel extends Application {
 			public void handle(long arg0) {
 				
 				repaint();
-				sleepQuietly(500);
+				sleepQuietly(Manager.SLEEP_TIME);
 				
 			}
 		}.start();
@@ -120,11 +100,11 @@ public class AntPanel extends Application {
 	}
 	private void repaint(){
 
-		gc.clearRect(0, 0, 900, 900);
+		gc.clearRect(0, 0, PANEL_SIZE, PANEL_SIZE);
 
 		Manager.getInstance().lock.lock();
-		for (int i = 0; i < world.getWidth(); i++) {
-			for (int j = 0; j < world.getHeight(); j++) {
+		for (int i = 0; i < World.WIDTH; i++) {
+			for (int j = 0; j < World.HEIGHT; j++) {
 				Cell c = world.getCell(i, j);
 				GroundState g = c.getG();
 
@@ -138,7 +118,7 @@ public class AntPanel extends Application {
 				}
 				if (c.getA() != null) {
 					//System.out.println("Ho spostato " + c.getA().getName() + " " + c.getA().getXPos()+" "+c.getA().getYPos()+" con livello "+c.getA().getLevel()); 
-
+					
 					gc.setFill(Color.RED);
 					gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE,
 							CELLSIZE, CELLSIZE,10,10);
