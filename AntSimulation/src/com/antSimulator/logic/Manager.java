@@ -12,7 +12,7 @@ public class Manager {
 
 	public static final int CORE_NUMBER = 4;
 	public static boolean ISACTIVE = true;
-	public static final int SLEEP_TIME = 10;
+	public static final int SLEEP_TIME = 1;
 
 	public World world;
 	public Lock lock = new ReentrantLock();
@@ -50,10 +50,12 @@ public class Manager {
 		dir.add(Ant.LEFT);
 		dir.add(Ant.RIGHT);
 		boolean check = false;
+		
+		// sto provando a dare una direzione privilegiata alle formiche per simulare un movimento più naturale. Aldo
+		int k = a.getCurrentDirection();
+		
 		while (dir.size() != 0 && !check) {
-			// TO-DO
-
-			int k = new Random().nextInt(dir.size());
+			
 			Cell currentChoise = world.getCell((int) a.getXPos(),(int) a.getYPos());
 
 			switch (dir.get(k)) {
@@ -84,8 +86,14 @@ public class Manager {
 			}
 
 			dir.remove(k);
+			
+			
+			if(dir.size() != 0)
+				k = new Random().nextInt(dir.size());
+			if(!check)
+				a.setCurrentDirection(k);
 		}
-
+		
 	}
 
 	private boolean choose(int dx, int dy, Cell currentChoise, Ant a) {

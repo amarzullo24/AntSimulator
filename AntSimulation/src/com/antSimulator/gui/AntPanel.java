@@ -19,8 +19,8 @@ import com.antSimulator.logic.World;
 
 public class AntPanel extends Application {
 
-	public static final int CELLSIZE = 4;
-	public static final int PANEL_SIZE = 500;
+	public static final int CELLSIZE = 3;
+	public static final int PANEL_SIZE = 600;
 	
 	private World world;
 	private Group root;
@@ -43,10 +43,6 @@ public class AntPanel extends Application {
 	public void start(Stage stage) throws Exception {
 
 		this.stage = stage;
-		//		root = new Group();
-		//		sc = new Scene(root, 900, 900);
-		//		stage.setScene(sc);
-		//		group = new Group();
 
 		this.stage.setTitle("AntSimulator!");
 		this.root = new Group();

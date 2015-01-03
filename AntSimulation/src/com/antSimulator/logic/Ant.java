@@ -1,6 +1,7 @@
 package com.antSimulator.logic;
 
 import java.awt.Point;
+import java.util.Random;
 
 public class Ant {
 
@@ -18,6 +19,8 @@ public class Ant {
 	private int level;
 	private Point position;
 	private String name;
+	
+	private int currentDirection = new Random().nextInt(4);
  
 	public Ant(int nestLevel, Point pos, int num) {
 		setDirection(-1);
@@ -84,6 +87,14 @@ public class Ant {
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public int getCurrentDirection() {
+		return currentDirection;
+	}
+
+	public void setCurrentDirection(int currentDirection) {
+		this.currentDirection = currentDirection;
 	}
 	
 }

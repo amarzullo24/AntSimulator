@@ -86,6 +86,8 @@ public class World {
 			return null;
 		else if (matrix[xPos][yPos].getG().getLevel() == GroundState.MAXLEVEL)
 			return null;
+		else if (matrix[xPos][yPos].getA() != null)
+			return null;
 		else
 			return matrix[xPos][yPos];
 	}
