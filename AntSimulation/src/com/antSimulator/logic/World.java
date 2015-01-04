@@ -8,7 +8,7 @@ import java.util.concurrent.BlockingQueue;
 public class World {
 
 
-	public static final int NUM_OF_ANTS = 50;
+	public static final int NUM_OF_ANTS = 5;
 	public static final int WIDTH = 200;
 	public static final int HEIGHT = 200;
 	private Cell[][] matrix;
@@ -61,7 +61,7 @@ public class World {
 		}
 		
 		
-		for (int k = 0; k < 500; k++) {
+		for (int k = 0; k < 5; k++) {
 			
 			int i = new Random().nextInt(HEIGHT);
 			int j = new Random().nextInt(WIDTH);

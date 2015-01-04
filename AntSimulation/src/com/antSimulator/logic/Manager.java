@@ -10,9 +10,14 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Manager {
 
-	public static final int CORE_NUMBER = 4;
+	int cont_left = 0;
+	int cont_r = 0;
+	int cont_u = 0;
+	int cont_d = 0;
+	
+	public static final int CORE_NUMBER = 2;
 	public static boolean ISACTIVE = true;
-	public static final int SLEEP_TIME = 1;
+	public static final int SLEEP_TIME = 10;
 
 	public World world;
 	public Lock lock = new ReentrantLock();
@@ -45,8 +50,8 @@ public class Manager {
 	public void moveAnt(Ant a) throws InterruptedException {
 
 		ArrayList<Integer> dir = new ArrayList<Integer>();
-		dir.add(Ant.DOWN);
 		dir.add(Ant.UP);
+		dir.add(Ant.DOWN);
 		dir.add(Ant.LEFT);
 		dir.add(Ant.RIGHT);
 		boolean check = false;
@@ -60,23 +65,28 @@ public class Manager {
 
 			switch (dir.get(k)) {
 			case Ant.UP:
+				cont_u++;
 				currentChoise=world.getCell((int) a.getXPos(), (int) a.getYPos() - 1);
 				if ( currentChoise!= null)
 					check = choose(0, -1, currentChoise, a);
 				break;
 			case Ant.DOWN:
+				cont_d++;
 				currentChoise=world.getCell((int) a.getXPos(), (int) a.getYPos() + 1);
-				if ( currentChoise!= null)
+				if ( currentChoise!= null){
 					check = choose(0, 1, currentChoise, a);
+				}
 				break;
 
 			case Ant.LEFT:
+				cont_left++;
 				currentChoise=world.getCell((int) a.getXPos()-1, (int) a.getYPos());
 				if ( currentChoise!= null)
 					check = choose(-1, 0, currentChoise, a);
 				break;
 
 			case Ant.RIGHT:
+				cont_r++;
 				currentChoise=world.getCell((int) a.getXPos()+1, (int) a.getYPos());
 				if ( currentChoise!= null)
 					check = choose(1, 0, currentChoise, a);
@@ -92,6 +102,12 @@ public class Manager {
 				k = new Random().nextInt(dir.size());
 			if(!check)
 				a.setCurrentDirection(k);
+			
+//			System.out.println("U: "+cont_u);
+//			System.out.println("D: "+cont_d);
+//			System.out.println("L: "+cont_left);
+//			System.out.println("R: "+cont_r);
+//			System.out.println();
 		}
 		
 	}
