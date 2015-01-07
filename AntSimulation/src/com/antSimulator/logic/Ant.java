@@ -12,17 +12,19 @@ public class Ant {
 	
 	public static final int SEARCH = 5;
 	public static final int FOUND = 6;
-	public static final int PHRELEASE = 7;
+	public static final int PHRELEASE = 10;
 	
 	private int direction;
 	private int antState;
 	private int level;
 	private Point position;
 	private String name;
-	
+	private int step_Ant=0;
+	private Random r;
 	private int currentDirection = new Random().nextInt(4);
  
 	public Ant(int nestLevel, Point pos, int num) {
+		r=new Random();
 		setDirection(-1);
 		setAntState(SEARCH);
 		setLevel(nestLevel);
@@ -57,12 +59,12 @@ public class Ant {
 		position.y=y;
 	}
 	
-	public double getXPos(){
-		return position.getX();
+	public int getXPos(){
+		return position.x;
 	}
 	
-	public double getYPos(){
-		return position.getY();
+	public int getYPos(){
+		return position.y;
 	}
 
 	public int getLevel() {
@@ -95,6 +97,19 @@ public class Ant {
 
 	public void setCurrentDirection(int currentDirection) {
 		this.currentDirection = currentDirection;
+	}
+
+	public int getStep_Ant() {
+		return step_Ant;
+	}
+
+	public void setStep_Ant(int step_Ant) {
+		this.step_Ant = step_Ant;
+	}
+
+	public int getNextDir() {
+		
+		return r.nextInt(4);
 	}
 	
 }

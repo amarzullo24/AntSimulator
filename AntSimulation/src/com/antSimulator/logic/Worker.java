@@ -14,12 +14,19 @@ public class Worker extends Thread {
 	public void run() {
 		try {
 			while (Manager.ISACTIVE) {
-
+				
+				Manager.getInstance().lock.lock();
+				while(Manager.getInstance().updating)
+					Manager.getInstance().condition.await();
+				
+				Manager.getInstance().lock.unlock();
+				
 				Ant a = ants.take();
 				
 				Manager.getInstance().moveAnt(a);
 	
 				ants.put(a);
+				
 				sleepQuietly(Manager.SLEEP_TIME);
 			}
 		} catch (InterruptedException e) {
@@ -36,5 +43,6 @@ public class Worker extends Thread {
 			e.printStackTrace();
 		}
 	}
+	
 
 }
