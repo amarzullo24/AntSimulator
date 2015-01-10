@@ -4,17 +4,24 @@ public class GroundState {
 
 	public static final int MAXLEVEL = 2;
 	private int level;
-	private float phLevel;
+	private float foundPhLevel;
+	private float searchPhLevel;
 
-	private float constPh=(float) 1.5;
+
 	
 	public GroundState(int l) {
 		setLevel(l);
-		setPhLevel(0);
+		setFoundPhLevel(0);
+		setSearchPhLevel(0);
+		
 	}
 	
-	public void increasePh(){
-		setPhLevel(getPhLevel() + constPh);
+	public void increaseFoundPh(){
+		setFoundPhLevel(getFoundPhLevel() + Ant.FOUNDPHRELEASE);
+	}
+	
+	public void increaseSearchPh(){
+		setSearchPhLevel(getSearchPhLevel()+Ant.SEARCHPHRELEASE);
 	}
 
 	public int getLevel() {
@@ -25,11 +32,19 @@ public class GroundState {
 		this.level = level;
 	}
 
-	public float getPhLevel() {
-		return phLevel;
+	public float getFoundPhLevel() {
+		return foundPhLevel;
 	}
 
-	public void setPhLevel(float phLevel) {
-		this.phLevel = phLevel;
+	public void setFoundPhLevel(float phLevel) {
+		this.foundPhLevel = phLevel;
+	}
+
+	public float getSearchPhLevel() {
+		return searchPhLevel;
+	}
+
+	public void setSearchPhLevel(float searchPhLevel) {
+		this.searchPhLevel = searchPhLevel;
 	}
 }

@@ -23,7 +23,7 @@ public class Worker extends Thread {
 				
 				Ant a = ants.take();
 				
-				Manager.getInstance().moveAnt(a);
+				Manager.getInstance().moveAnts(a);
 	
 				ants.put(a);
 				

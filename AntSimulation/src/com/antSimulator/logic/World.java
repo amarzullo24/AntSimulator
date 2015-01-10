@@ -13,6 +13,8 @@ public class World {
 	public static final int HEIGHT = 100;
 	public static final int FOOD_WIDTH = 5;
 	public static final int FOOD_HEIGHT = 5;
+	public static final int NEST_WIDTH=6;
+	public static final int NEST_HEIGHT=6;
 	private Cell[][] matrix;
 	private boolean[][] lockedCell;
 	private BlockingQueue<Ant> ants;
@@ -48,12 +50,12 @@ public class World {
 		lockedCell = new boolean[WIDTH][HEIGHT];
 		initWorld();
 
-		nest = new Point(50, 55);
+		nest = new Point(10, 15);
 		food = new ArrayList<Point>();
-		food.add(new Point(10, 20));
-		food.add(new Point(30, 10));
+		food.add(new Point(40, 20));
+		food.add(new Point(30, 50));
 
-		nestlevel = getWorld()[5][5].getG().getLevel();
+		nestlevel = getWorld()[nest.x][nest.y].getG().getLevel();
 
 	}
 

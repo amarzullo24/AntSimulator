@@ -18,7 +18,9 @@ public class Manager {
 	public static final int CORE_NUMBER = 7;
 	public static boolean ISACTIVE = true;
 	public static final int SLEEP_TIME = 10;
+
 	public boolean updating;
+
 	public World world;
 	public Lock lock = new ReentrantLock();
 	public Condition condition = lock.newCondition();
@@ -45,24 +47,29 @@ public class Manager {
 
 	public World loadWorld() {
 		return new World();
+
 	}
 
-	public void moveAnt(Ant a) throws InterruptedException {
-		a.setStep_Ant(a.getStep_Ant() + 1);
+	public void moveAnts(Ant a) {
+		ArrayList<Integer> erasedDirection = new ArrayList<Integer>();
+		erasedDirection.add(backDirection(a));
 
-		if (a.getStep_Ant() == 100) {
+		a.nextStep();
+		if (a.getStep_Ant() == 30) {
 			a.setStep_Ant(0);
-			a.setCurrentDirection(a.getNextDir());
+			erasedDirection.add(a.getCurrentDirection());
 		}
-		// sto provando a dare una direzione privilegiata alle formiche per
-		// simulare un movimento più naturale. Aldo
-		if (a.getAntState() == Ant.FOUND)
-			chooseRandomDirection(a);
-		else {
 
-			int k = chooseDirection(a);
-			boolean check = false;
-			Cell currentChoise = null;
+		boolean check = false;
+		int k = a.getCurrentDirection();
+		Cell currentChoise = null;
+		while (!check && !(erasedDirection.size() == 4)) {
+			if (a.getAntState() == Ant.SEARCH) {
+				k = chooseSearchDirection(a, erasedDirection);
+			} else if (a.getAntState() == Ant.FOUND) {
+				k = chooseFoundDirection(a, erasedDirection);
+
+			}
 			switch (k) {
 			case Ant.UP:
 
@@ -70,7 +77,6 @@ public class Manager {
 						(int) a.getYPos() - 1);
 				if (currentChoise != null) {
 					check = choose(0, -1, currentChoise, a);
-
 				}
 				break;
 			case Ant.DOWN:
@@ -104,7 +110,136 @@ public class Manager {
 				break;
 			}
 			if (!check)
-				chooseRandomDirection(a);
+				erasedDirection.add(k);
+
+		}
+	}
+
+	private int chooseFoundDirection(Ant a, ArrayList<Integer> erasedDirection) {
+		int dir;
+		int searchPh;
+
+		if (!contains(Ant.UP, erasedDirection)) {
+			dir = Ant.UP;
+			searchPh = getSearchPh(a.getXPos(), a.getYPos() - 1);
+
+		} else {
+			dir = Ant.RIGHT;
+			searchPh = getSearchPh(a.getXPos() + 1, a.getYPos());
+		}
+
+		if (!contains(Ant.RIGHT, erasedDirection)
+				&& searchPh < getSearchPh(a.getXPos() + 1, a.getYPos())) {
+			searchPh = getSearchPh(a.getXPos() + 1, a.getYPos());
+			dir = Ant.RIGHT;
+		}
+		if (!contains(Ant.LEFT, erasedDirection)
+				&& searchPh < getSearchPh(a.getXPos() - 1, a.getYPos())) {
+			searchPh = getSearchPh(a.getXPos() - 1, a.getYPos());
+			dir = Ant.LEFT;
+		}
+		if (!contains(Ant.DOWN, erasedDirection)
+				&& searchPh < getSearchPh(a.getXPos(), a.getYPos() + 1)) {
+			searchPh = getSearchPh(a.getXPos(), a.getYPos() + 1);
+			dir = Ant.DOWN;
+		}
+		if (searchPh == 0 && contains(a.getCurrentDirection(), erasedDirection)) {
+			dir = backDirection(a);
+			while (contains(dir, erasedDirection))
+				dir = new Random().nextInt(4);
+			a.setCurrentDirection(dir);
+			return dir;
+		}
+		switch (a.getCurrentDirection()) {
+		case Ant.UP:
+			if (searchPh == getSearchPh(a.getXPos(), a.getYPos() - 1))
+				return Ant.UP;
+			break;
+		case Ant.RIGHT:
+			if (searchPh == getSearchPh(a.getXPos() + 1, a.getYPos()))
+				return Ant.RIGHT;
+			break;
+		case Ant.LEFT:
+			if (searchPh == getSearchPh(a.getXPos() - 1, a.getYPos()))
+				return Ant.LEFT;
+			break;
+		case Ant.DOWN:
+			if (searchPh == getSearchPh(a.getXPos(), a.getYPos() + 1))
+				return Ant.DOWN;
+			break;
+		default:
+			break;
+		}
+
+		a.setCurrentDirection(dir);
+
+		return dir;
+
+	}
+
+	public void moveAnt(Ant a) throws InterruptedException {
+		ArrayList<Integer> erasedDirection = new ArrayList<Integer>();
+		erasedDirection.add(backDirection(a));
+
+		a.nextStep();
+
+		if (a.getStep_Ant() == Ant.MAXSTEPSAMEDIR) {
+			a.setStep_Ant(0);
+			a.nextDir();
+		}
+		// sto provando a dare una direzione privilegiata alle formiche per
+		// simulare un movimento più naturale. Aldo
+		if (a.getAntState() == Ant.FOUND)
+			chooseRandomDirection(a);
+		else {
+
+			int k = chooseSearchDirection(a, erasedDirection);
+			if (k != -1) {
+				boolean check = false;
+				Cell currentChoise = null;
+				switch (k) {
+				case Ant.UP:
+
+					currentChoise = world.getCell((int) a.getXPos(),
+							(int) a.getYPos() - 1);
+					if (currentChoise != null) {
+						check = choose(0, -1, currentChoise, a);
+
+					}
+					break;
+				case Ant.DOWN:
+
+					currentChoise = world.getCell((int) a.getXPos(),
+							(int) a.getYPos() + 1);
+					if (currentChoise != null) {
+						check = choose(0, 1, currentChoise, a);
+
+					}
+					break;
+
+				case Ant.LEFT:
+
+					currentChoise = world.getCell((int) a.getXPos() - 1,
+							(int) a.getYPos());
+					if (currentChoise != null)
+						check = choose(-1, 0, currentChoise, a);
+
+					break;
+
+				case Ant.RIGHT:
+
+					currentChoise = world.getCell((int) a.getXPos() + 1,
+							(int) a.getYPos());
+					if (currentChoise != null)
+						check = choose(1, 0, currentChoise, a);
+
+					break;
+				default:
+					break;
+				}
+				if (!check)
+					chooseRandomDirection(a);
+			}
 		}
 
 	}
@@ -174,62 +309,77 @@ public class Manager {
 
 	}
 
-	private int chooseDirection(Ant a) {
-		int erase = backDirection(a);
+	// ahahahah XD
+	private boolean contains(int dir, ArrayList<Integer> erasedDirection) {
+		boolean True = false;
+		for (Integer i : erasedDirection) {
+			if (dir == i)
+				return true;
+
+		}
+		return True;
+	}
+
+	private int chooseSearchDirection(Ant a, ArrayList<Integer> erasedDirection) {
 		int dir;
-		int ph;
-		ArrayList<Integer> directionPriority = new ArrayList<Integer>();
-		if (erase != Ant.UP) {
+		int foundPh;
+
+		if (!contains(Ant.UP, erasedDirection)) {
 			dir = Ant.UP;
-			ph = getPh(a.getXPos(), a.getYPos() - 1);
+			foundPh = getFoundPh(a.getXPos(), a.getYPos() - 1);
 
 		} else {
 			dir = Ant.RIGHT;
-			ph = getPh(a.getXPos() + 1, a.getYPos());
+			foundPh = getFoundPh(a.getXPos() + 1, a.getYPos());
 		}
-		directionPriority.add(dir);
-		if (erase != Ant.RIGHT && ph < getPh(a.getXPos() + 1, a.getYPos())) {
-			ph = getPh(a.getXPos() + 1, a.getYPos());
-			directionPriority.add(0, dir);
-			dir = Ant.RIGHT;
-		} else
-			directionPriority.add(Ant.RIGHT);
-		if (erase != Ant.LEFT && ph < getPh(a.getXPos() - 1, a.getYPos())) {
-			ph = getPh(a.getXPos() - 1, a.getYPos());
-			directionPriority.add(0, dir);
-			dir = Ant.LEFT;
-		} else
-			directionPriority.add(Ant.LEFT);
-		if (erase != Ant.DOWN && ph < getPh(a.getXPos(), a.getYPos() + 1)) {
-			ph = getPh(a.getXPos(), a.getYPos() + 1);
-			directionPriority.add(0, dir);
-			dir = Ant.DOWN;
-		} else
-			directionPriority.add(Ant.DOWN);
 
+		if (!contains(Ant.RIGHT, erasedDirection)
+				&& foundPh < getFoundPh(a.getXPos() + 1, a.getYPos())) {
+			foundPh = getFoundPh(a.getXPos() + 1, a.getYPos());
+			dir = Ant.RIGHT;
+		}
+		if (!contains(Ant.LEFT, erasedDirection)
+				&& foundPh < getFoundPh(a.getXPos() - 1, a.getYPos())) {
+			foundPh = getFoundPh(a.getXPos() - 1, a.getYPos());
+			dir = Ant.LEFT;
+		}
+		if (!contains(Ant.DOWN, erasedDirection)
+				&& foundPh < getFoundPh(a.getXPos(), a.getYPos() + 1)) {
+			foundPh = getFoundPh(a.getXPos(), a.getYPos() + 1);
+			dir = Ant.DOWN;
+		}
+
+		if (foundPh == 00 && contains(a.getCurrentDirection(), erasedDirection)) {
+			dir = backDirection(a);
+			while (contains(dir, erasedDirection))
+				dir = new Random().nextInt(4);
+			a.setCurrentDirection(dir);
+			return dir;
+		}
 		switch (a.getCurrentDirection()) {
 		case Ant.UP:
-			if (ph == getPh(a.getXPos(), a.getYPos() - 1))
+			if (foundPh == getFoundPh(a.getXPos(), a.getYPos() - 1))
 				return Ant.UP;
 			break;
 		case Ant.RIGHT:
-			if (ph == getPh(a.getXPos() + 1, a.getYPos()))
+			if (foundPh == getFoundPh(a.getXPos() + 1, a.getYPos()))
 				return Ant.RIGHT;
 			break;
 		case Ant.LEFT:
-			if (ph == getPh(a.getXPos() - 1, a.getYPos()))
+			if (foundPh == getFoundPh(a.getXPos() - 1, a.getYPos()))
 				return Ant.LEFT;
 			break;
 		case Ant.DOWN:
-			if (ph == getPh(a.getXPos(), a.getYPos() + 1))
+			if (foundPh == getFoundPh(a.getXPos(), a.getYPos() + 1))
 				return Ant.DOWN;
 			break;
 		default:
 			break;
 		}
-		a.setCurrentDirection(dir);
-		return dir;
 
+		a.setCurrentDirection(dir);
+
+		return dir;
 	}
 
 	private int backDirection(Ant a) {
@@ -255,10 +405,18 @@ public class Manager {
 		return -1;
 	}
 
-	private int getPh(int dx, int dy) {
+	private int getSearchPh(int dx, int dy) {
 		int ph = 0;
 		if (world.getCell(dx, dy) != null)
-			ph = (int) world.getCell(dx, dy).getG().getPhLevel();
+			ph = (int) world.getCell(dx, dy).getG().getSearchPhLevel();
+
+		return ph;
+	}
+
+	private int getFoundPh(int dx, int dy) {
+		int ph = 0;
+		if (world.getCell(dx, dy) != null)
+			ph = (int) world.getCell(dx, dy).getG().getFoundPhLevel();
 
 		return ph;
 	}
@@ -296,16 +454,35 @@ public class Manager {
 
 				a.setXPos(whereGo.getX());
 				a.setYPos(whereGo.getY());
+				if (a.isReleasePh()) {
+					a.increaseStepPhRelease();
+					if (a.getAntState() == Ant.SEARCH) {
+						current.getG().increaseSearchPh();
 
-				if (a.getAntState() == Ant.FOUND) {
-					current.getG().setPhLevel(
-							current.getG().getPhLevel() + Ant.PHRELEASE);
+					}
+					if (a.getAntState() == Ant.FOUND) {
+						current.getG().increaseFoundPh();
+
+					}
+					a.checkStepPhRelease();
+				}
+				if (founded(a)) {
+					if (a.getAntState() == Ant.SEARCH) {
+						a.setAntState(Ant.FOUND);
+						a.nextDir();
+						a.restartPhRelease();
+					}
+				}
+				if (nested(a)) {
+					if (a.getAntState() == Ant.FOUND) {
+						a.setAntState(Ant.SEARCH);
+						a.nextDir();
+						a.restartPhRelease();
+						System.out.println("Ho portato il cibo alla tana. "
+								+ a.getName());
+					}
 
 				}
-				if (founded(a))
-					a.setAntState(Ant.FOUND);
-				if (nested(a))
-					a.setAntState(Ant.SEARCH);
 				whereGo.setA(a);
 				current.setA(null);
 			} else if (a.getLevel() < whereGo.getG().getLevel())
@@ -319,7 +496,9 @@ public class Manager {
 
 	private boolean nested(Ant a) {
 		Point nest = world.getNest();
-		if (nest.x == a.getXPos() && nest.y == a.getYPos())
+		if (nest.x + World.NEST_WIDTH >= a.getXPos() && nest.x <= a.getXPos()
+				&& nest.y <= a.getYPos()
+				&& nest.y + World.NEST_HEIGHT >= a.getYPos())
 			return true;
 		return false;
 	}
@@ -347,11 +526,19 @@ public class Manager {
 			for (int j = 0; j < World.HEIGHT; j++) {
 				world.getCell(i, j)
 						.getG()
-						.setPhLevel(
-								world.getCell(i, j).getG().getPhLevel()
+						.setFoundPhLevel(
+								world.getCell(i, j).getG().getFoundPhLevel()
+										- PHREDUCTION*2);
+				world.getCell(i, j)
+						.getG()
+						.setSearchPhLevel(
+								world.getCell(i, j).getG().getSearchPhLevel()
 										- PHREDUCTION);
-				if (world.getCell(i, j).getG().getPhLevel() < 0)
-					world.getCell(i, j).getG().setPhLevel(0);
+				if (world.getCell(i, j).getG().getSearchPhLevel() < 0) {
+					world.getCell(i, j).getG().setSearchPhLevel(0);
+				}
+				if (world.getCell(i, j).getG().getFoundPhLevel() < 0)
+					world.getCell(i, j).getG().setFoundPhLevel(0);
 			}
 
 		}
