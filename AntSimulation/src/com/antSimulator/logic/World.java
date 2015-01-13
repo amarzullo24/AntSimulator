@@ -9,8 +9,8 @@ import java.util.concurrent.BlockingQueue;
 public class World {
 
 	public static final int NUM_OF_ANTS = 80;
-	public static final int WIDTH = 100;
-	public static final int HEIGHT = 100;
+	public static final int WIDTH = 60;
+	public static final int HEIGHT = 60;
 	public static final int FOOD_WIDTH = 5;
 	public static final int FOOD_HEIGHT = 5;
 	public static final int NEST_WIDTH=6;

@@ -47,4 +47,16 @@ public class GroundState {
 	public void setSearchPhLevel(float searchPhLevel) {
 		this.searchPhLevel = searchPhLevel;
 	}
+
+	public void increaseNeigFoundPh(Ant a,String type) {
+		int incrPh=a.getPheromones().get(type).getQuantity()/10;
+		setFoundPhLevel(getFoundPhLevel()+incrPh);
+		
+	}
+
+	public void increaseNeigSearchPh(Ant a,String type) {
+		int incrPh=a.getPheromones().get(type).getQuantity()/10;
+		setSearchPhLevel(getSearchPhLevel()+ incrPh);
+		
+	}
 }

@@ -14,7 +14,7 @@ public class Manager {
 	int cont_u = 0;
 	int cont_d = 0;
 
-	public static final int PHREDUCTION = 1;
+	public static final int PHREDUCTION = 50;
 	public static final int CORE_NUMBER = 7;
 	public static boolean ISACTIVE = true;
 	public static final int SLEEP_TIME = 10;
@@ -456,17 +456,21 @@ public class Manager {
 				a.setYPos(whereGo.getY());
 				if (a.getAntState() == Ant.SEARCH) {
 					current.getG().increaseSearchPh(a);
+
 					a.releasePheromones(Ant.RESEARCHPHEROMONE);
+					diffusePheromones(current.getG(), a);
 
 				}
 				if (a.getAntState() == Ant.FOUND) {
 					current.getG().increaseFoundPh(a);
 					a.releasePheromones(Ant.FOUNDPHEROMONE);
+					diffusePheromones(current.getG(), a);
 
 				}
 
 				if (founded(a)) {
 					if (a.getAntState() == Ant.SEARCH) {
+						a.setStep_Ant(0);
 						a.setAntState(Ant.FOUND);
 						a.setCurrentDirection(backDirection(a));
 						a.restartPhRelease(Ant.FOUNDPHEROMONE);
@@ -474,6 +478,7 @@ public class Manager {
 				}
 				if (nested(a)) {
 					if (a.getAntState() == Ant.FOUND) {
+						a.setStep_Ant(0);
 						a.setAntState(Ant.SEARCH);
 						a.setCurrentDirection(backDirection(a));
 						a.restartPhRelease(Ant.RESEARCHPHEROMONE);
@@ -545,6 +550,46 @@ public class Manager {
 		condition.signalAll();
 		lock.unlock();
 
+	}
+
+	private void diffusePheromones(GroundState groundState, Ant a) {
+		ArrayList<Cell> neighbour = getNeighbour(a.getXPos(), a.getYPos());
+		for (Cell c : neighbour) {
+			if (a.getAntState() == Ant.FOUND)
+				c.getG().increaseNeigFoundPh(a, Ant.FOUNDPHEROMONE);
+			else
+				c.getG().increaseNeigSearchPh(a, Ant.RESEARCHPHEROMONE);
+		}
+
+	}
+
+	private ArrayList<Cell> getNeighbour(int xPos, int yPos) {
+		ArrayList<Cell> neig = new ArrayList<Cell>();
+		if (world.getCell(xPos + 1, yPos) != null) {
+			neig.add(world.getCell(xPos + 1, yPos));
+		}
+		if (world.getCell(xPos - 1, yPos) != null) {
+			neig.add(world.getCell(xPos - 1, yPos));
+		}
+		if (world.getCell(xPos + 1, yPos - 1) != null) {
+			neig.add(world.getCell(xPos + 1, yPos - 1));
+		}
+		if (world.getCell(xPos - 1, yPos - 1) != null) {
+			neig.add(world.getCell(xPos - 1, yPos - 1));
+		}
+		if (world.getCell(xPos + 1, yPos + 1) != null) {
+			neig.add(world.getCell(xPos + 1, yPos + 1));
+		}
+		if (world.getCell(xPos - 1, yPos + 1) != null) {
+			neig.add(world.getCell(xPos - 1, yPos + 1));
+		}
+		if (world.getCell(xPos, yPos + 1) != null) {
+			neig.add(world.getCell(xPos, yPos + 1));
+		}
+		if (world.getCell(xPos, yPos - 1) != null) {
+			neig.add(world.getCell(xPos, yPos - 1));
+		}
+		return neig;
 	}
 
 	private class UpdateThread extends Thread {
