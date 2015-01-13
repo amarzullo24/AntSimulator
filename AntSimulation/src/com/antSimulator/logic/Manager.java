@@ -454,30 +454,29 @@ public class Manager {
 
 				a.setXPos(whereGo.getX());
 				a.setYPos(whereGo.getY());
-				if (a.isReleasePh()) {
-					a.increaseStepPhRelease();
-					if (a.getAntState() == Ant.SEARCH) {
-						current.getG().increaseSearchPh();
+				if (a.getAntState() == Ant.SEARCH) {
+					current.getG().increaseSearchPh(a);
+					a.releasePheromones(Ant.RESEARCHPHEROMONE);
 
-					}
-					if (a.getAntState() == Ant.FOUND) {
-						current.getG().increaseFoundPh();
-
-					}
-					a.checkStepPhRelease();
 				}
+				if (a.getAntState() == Ant.FOUND) {
+					current.getG().increaseFoundPh(a);
+					a.releasePheromones(Ant.FOUNDPHEROMONE);
+
+				}
+
 				if (founded(a)) {
 					if (a.getAntState() == Ant.SEARCH) {
 						a.setAntState(Ant.FOUND);
-						a.nextDir();
-						a.restartPhRelease();
+						a.setCurrentDirection(backDirection(a));
+						a.restartPhRelease(Ant.FOUNDPHEROMONE);
 					}
 				}
 				if (nested(a)) {
 					if (a.getAntState() == Ant.FOUND) {
 						a.setAntState(Ant.SEARCH);
-						a.nextDir();
-						a.restartPhRelease();
+						a.setCurrentDirection(backDirection(a));
+						a.restartPhRelease(Ant.RESEARCHPHEROMONE);
 						System.out.println("Ho portato il cibo alla tana. "
 								+ a.getName());
 					}
@@ -528,7 +527,7 @@ public class Manager {
 						.getG()
 						.setFoundPhLevel(
 								world.getCell(i, j).getG().getFoundPhLevel()
-										- PHREDUCTION*2);
+										- PHREDUCTION);
 				world.getCell(i, j)
 						.getG()
 						.setSearchPhLevel(

@@ -104,11 +104,11 @@ public class AntPanel extends Application {
 			for (int j = 0; j < World.HEIGHT; j++) {
 				Cell c = world.getCell(i, j);
 				GroundState g = c.getG();
-				gc.setGlobalAlpha(g.getFoundPhLevel() / 100);
+				gc.setGlobalAlpha(g.getFoundPhLevel() / 1000);
 				gc.setFill(Color.GREENYELLOW);
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
-				gc.setGlobalAlpha(g.getSearchPhLevel()/100);
+				gc.setGlobalAlpha(g.getSearchPhLevel()/1000);
 				gc.setFill(Color.GRAY);
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
