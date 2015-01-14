@@ -17,7 +17,8 @@ public class Manager {
 	public static final int PHREDUCTION = 50;
 	public static final int CORE_NUMBER = 7;
 	public static boolean ISACTIVE = true;
-	public static final int SLEEP_TIME = 10;
+	public static final int SLEEP_TIME = 5;
+	public static final int UPDATE_TIME = 200;
 
 	public boolean updating;
 
@@ -600,9 +601,8 @@ public class Manager {
 				Manager.getInstance().update();
 
 				try {
-					Thread.sleep(1000);
+					Thread.sleep(UPDATE_TIME);
 				} catch (InterruptedException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 
