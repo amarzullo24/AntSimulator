@@ -1,20 +1,18 @@
 package com.antSimulator.gui;
-import javax.swing.GroupLayout.Alignment;
 
+import com.antSimulator.logic.Manager;
+import com.antSimulator.logic.World;
+
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.geometry.Pos;
 import javafx.scene.control.Label;
-import javafx.scene.control.LabelBuilder;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SliderBuilder;
-import javafx.scene.control.SplitPane;
-import javafx.scene.control.SplitPaneBuilder;
-import javafx.scene.control.ToggleButton;
-import javafx.scene.control.ToggleButtonBuilder;
-import javafx.scene.control.ToggleGroup;
+import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBoxBuilder;
-import javafx.util.StringConverter;
 
 public class RightPanel {
 
@@ -24,11 +22,12 @@ public class RightPanel {
 	public final static String BUTTONLEFT = "buttonl";
 	public final static String BUTTONCENTER = "buttonc";
 	public final static String BUTTONRIGHT = "buttonr";
-	
 
 	private VBox box;
 	private Label antValue;
 	private Label stepValue;
+	
+	private VBox sliderbox;
 
 	public RightPanel() {
 		box = VBoxBuilder.create().id(RIGHTLAYOUT).build();
@@ -38,47 +37,68 @@ public class RightPanel {
 		HBox antbox = new HBox();
 		HBox stepbox = new HBox();
 		HBox buttonbox = new HBox();
-		VBox sliderbox = new VBox();
+		sliderbox = new VBox();
 
 
 		buttonbox.setAlignment(Pos.CENTER);
 		sliderbox.setSpacing(10);
 		antbox.setSpacing(10);
 		stepbox.setSpacing(10);
-		Label antLabel = LabelBuilder.create().id(LABELRIGHT)
-				.text("Numero di Formiche").build();
-		Label stepLabel = LabelBuilder.create().id(LABELRIGHT)
-				.text("Numero di step").build();
-		Label speedLabel = LabelBuilder.create().id(LABELRIGHT).text("Speed")
-				.build();
-
-		antValue = LabelBuilder.create().id(LABELRIGHT).text("0").build();
-		stepValue = LabelBuilder.create().id(LABELRIGHT).text("0").build();
-		Slider speedSlide = SliderBuilder.create().id(SPEEDSLIDE).min(1.0)
-				.max(4.0).scaleX(0.8).showTickLabels(true).scaleY(0.8).build();
-		sliderbox.setAlignment(Pos.CENTER_LEFT);
-		ToggleButton start = ToggleButtonBuilder.create().id(BUTTONLEFT)
-				.text("Start").build();
-		ToggleButton pause = ToggleButtonBuilder.create().id(BUTTONCENTER)
-				.text("Pause").build();
-		ToggleButton stop = ToggleButtonBuilder.create().id(BUTTONRIGHT)
-				.text("Stop").build();
-
-		ToggleGroup buttons = new ToggleGroup();
-		start.setToggleGroup(buttons);
-		pause.setToggleGroup(buttons);
-		stop.setToggleGroup(buttons);
-
-		buttons.selectToggle(stop);
-		antbox.getChildren().addAll(antLabel, antValue);
-		stepbox.getChildren().addAll(stepLabel, stepValue);
-		sliderbox.getChildren().addAll(speedLabel, speedSlide);
-		buttonbox.getChildren().addAll(start, pause, stop);
+		
+		buildSlideBar("PHREDUCTION",1,100,50);
+		buildSlideBar("UPDATE_TIME",10,300,200);
+		buildSlideBar("NUM_OF_ANTS", 1, World.MAX_NUM_OF_ANT, 10);
 
 		box.getChildren().addAll(antbox, stepbox, sliderbox, buttonbox);
 
 	}
+	
+	private void buildSlideBar(final String toSet, int maxValue, int minValue, int defaultValue){
+		
+		Slider s = SliderBuilder.create().id(SPEEDSLIDE).min(maxValue)
+				.max(minValue).scaleX(0.8).showTickLabels(true).scaleY(0.8).build();
+		
+		s.setValue(defaultValue);
+		s.setTooltip(new Tooltip(toSet));
+		
+		sliderbox.setAlignment(Pos.CENTER_LEFT);
+		
+		s.valueProperty().addListener(new ChangeListener<Number>() {
 
+			@Override
+			public void changed(ObservableValue<? extends Number> arg0,
+					Number arg1, Number newVal) {
+				
+				try {
+					
+					Manager.getInstance().getClass().getDeclaredField(toSet).set(this, newVal.intValue());
+					
+					
+				} catch (IllegalArgumentException | IllegalAccessException
+						| NoSuchFieldException | SecurityException e) {
+					
+					
+					try {
+						
+						//al momento l'unico metodo che non è nel manager lo metto nel catch
+						World.NUM_OF_ANTS = newVal.intValue();
+						Manager.getInstance().world.respawnAnts();
+					
+					} catch (SecurityException e1) {
+					
+						e1.printStackTrace();
+					} catch (IllegalArgumentException e1) {
+						
+						e1.printStackTrace();
+					}
+				}
+			}
+		});
+		
+		sliderbox.getChildren().addAll(s);
+	}
+
+	 
 	public void updateData(String ant, String step) {
 		antValue.setText(ant);
 		stepValue.setText(step);

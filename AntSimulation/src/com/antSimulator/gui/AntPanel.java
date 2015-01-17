@@ -10,6 +10,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
@@ -22,8 +23,9 @@ import com.antSimulator.logic.World;
 
 public class AntPanel extends Application {
 
-	public static final int CELLSIZE = 3;
-	public static final int PANEL_SIZE = 600;
+	public static final int CELLSIZE = 4;
+	public static final int PANEL_SIZE_X = World.WIDTH * CELLSIZE;
+	public static final int PANEL_SIZE_Y = World.HEIGHT*CELLSIZE;
 
 	private World world;
 	private Group root;
@@ -49,13 +51,19 @@ public class AntPanel extends Application {
 
 		this.stage.setTitle("AntSimulator!");
 		this.root = new Group();
-		this.canvas = new Canvas(PANEL_SIZE, PANEL_SIZE);
+		this.canvas = new Canvas(PANEL_SIZE_X, PANEL_SIZE_Y);
 		this.gc = canvas.getGraphicsContext2D();
 
 		// inits the repainter thread
 		initThread();
 
 		root.getChildren().add(canvas);
+		
+		HBox hbox = new HBox();
+		hbox.getChildren().add(canvas);
+		hbox.getChildren().add(new RightPanel().getBox());
+		root.getChildren().add(hbox);
+		
 		stage.setScene(new Scene(root));
 		stage.show();
 
@@ -97,7 +105,9 @@ public class AntPanel extends Application {
 
 	private void repaint() {
 
-		gc.clearRect(0, 0, PANEL_SIZE, PANEL_SIZE);
+		gc.clearRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
+		gc.setFill(Color.BLACK);
+		gc.strokeRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
 
 		Manager.getInstance().lock.lock();
 		for (int i = 0; i < World.WIDTH; i++) {
@@ -121,9 +131,7 @@ public class AntPanel extends Application {
 
 				}
 				if (c.getA() != null) {
-					// System.out.println("Ho spostato " + c.getA().getName() +
-					// " " +
-					// c.getA().getXPos()+" "+c.getA().getYPos()+" con livello "+c.getA().getLevel());
+					
 					gc.setGlobalAlpha(1.0);
 					if (c.getA().getAntState() == Ant.SEARCH)
 						gc.setFill(Color.RED);
@@ -132,6 +140,7 @@ public class AntPanel extends Application {
 
 					gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 							CELLSIZE, 10, 10);
+					
 
 				}// if
 

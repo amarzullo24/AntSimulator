@@ -8,9 +8,10 @@ import java.util.concurrent.BlockingQueue;
 
 public class World {
 
-	public static final int NUM_OF_ANTS = 10;
-	public static final int WIDTH = 60;
-	public static final int HEIGHT = 60;
+	public static int NUM_OF_ANTS = 10;
+	public static final short MAX_NUM_OF_ANT = 100;
+	public static final int WIDTH = 100;
+	public static final int HEIGHT = 100;
 	public static final int FOOD_WIDTH = 5;
 	public static final int FOOD_HEIGHT = 5;
 	public static final int NEST_WIDTH=6;
@@ -30,7 +31,7 @@ public class World {
 	}
 
 	private void spawnAnts() {
-		ants = new ArrayBlockingQueue<Ant>(NUM_OF_ANTS + 1);
+		ants = new ArrayBlockingQueue<Ant>(MAX_NUM_OF_ANT + 1);
 
 		for (int i = 0; i < NUM_OF_ANTS; i++)
 			try {
@@ -43,6 +44,37 @@ public class World {
 			}
 
 	}
+	
+	public void respawnAnts(){
+		
+		Manager.getInstance().lock.lock();
+		
+		if(ants.size() < NUM_OF_ANTS){
+			for (int i = ants.size(); i < NUM_OF_ANTS; i++)
+				try {
+
+					Ant a = new Ant(nestlevel, (Point) nest.clone(), i + 1);
+					ants.put(a);
+
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
+		}
+		else{
+			
+			while(ants.size() != NUM_OF_ANTS){
+				
+				Ant a = ants.remove();
+				this.matrix[a.getXPos()][a.getYPos()].setA(null);
+			}
+			
+			
+		}
+		
+		Manager.getInstance().lock.unlock();
+		
+	}
+	
 
 	private void loadWorld() {
 
@@ -53,7 +85,7 @@ public class World {
 		nest = new Point(10, 15);
 		food = new ArrayList<Point>();
 		food.add(new Point(40, 20));
-		food.add(new Point(30, 50));
+		food.add(new Point(50, 90));
 
 		nestlevel = getWorld()[nest.x][nest.y].getG().getLevel();
 

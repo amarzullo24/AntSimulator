@@ -14,11 +14,12 @@ public class Manager {
 	int cont_u = 0;
 	int cont_d = 0;
 
-	public static final int PHREDUCTION = 50;
+	public static int PHREDUCTION = 50;
+	public static int UPDATE_TIME = 200;
+
 	public static final int CORE_NUMBER = 7;
 	public static boolean ISACTIVE = true;
 	public static final int SLEEP_TIME = 5;
-	public static final int UPDATE_TIME = 200;
 
 	public boolean updating;
 
@@ -483,8 +484,7 @@ public class Manager {
 						a.setAntState(Ant.SEARCH);
 						a.setCurrentDirection(backDirection(a));
 						a.restartPhRelease(Ant.RESEARCHPHEROMONE);
-						System.out.println("Ho portato il cibo alla tana. "
-								+ a.getName());
+						//System.out.println("Ho portato il cibo alla tana. "+ a.getName());
 					}
 
 				}

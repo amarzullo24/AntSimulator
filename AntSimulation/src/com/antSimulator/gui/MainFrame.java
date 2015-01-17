@@ -26,7 +26,7 @@ public class MainFrame extends Application {
 
 		String css = MainFrame.class.getResource("Css.css").toExternalForm();
 		Group root = new Group();
-		Scene sc = new Scene(root, 800, 600);
+		Scene sc = new Scene(root, 800, 400);
 		stage.setScene(sc);
 
 		VBox mainBox = VBoxBuilder.create().id(MAINLAYOUT).build();
