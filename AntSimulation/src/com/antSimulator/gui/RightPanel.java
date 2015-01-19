@@ -45,8 +45,8 @@ public class RightPanel {
 		antbox.setSpacing(10);
 		stepbox.setSpacing(10);
 		
-		buildSlideBar("PHREDUCTION",1,100,50);
-		buildSlideBar("UPDATE_TIME",10,300,200);
+		buildSlideBar("PHREDUCTION",1,100,Manager.PHREDUCTION);
+		buildSlideBar("UPDATE_TIME",10,300,Manager.UPDATE_TIME);
 		buildSlideBar("NUM_OF_ANTS", 1, World.MAX_NUM_OF_ANT, 10);
 
 		box.getChildren().addAll(antbox, stepbox, sliderbox, buttonbox);

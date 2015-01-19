@@ -9,12 +9,7 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Manager {
 
-	int cont_left = 0;
-	int cont_r = 0;
-	int cont_u = 0;
-	int cont_d = 0;
-
-	public static int PHREDUCTION = 50;
+	public static int PHREDUCTION = 30;
 	public static int UPDATE_TIME = 200;
 
 	public static final int CORE_NUMBER = 7;
@@ -57,7 +52,7 @@ public class Manager {
 		erasedDirection.add(backDirection(a));
 
 		a.nextStep();
-		if (a.getStep_Ant() == 30) {
+		if (a.getStep_Ant() == Ant.MAXSTEPSAMEDIR) {
 			a.setStep_Ant(0);
 			erasedDirection.add(a.getCurrentDirection());
 		}
@@ -179,137 +174,6 @@ public class Manager {
 
 	}
 
-	public void moveAnt(Ant a) throws InterruptedException {
-		ArrayList<Integer> erasedDirection = new ArrayList<Integer>();
-		erasedDirection.add(backDirection(a));
-
-		a.nextStep();
-
-		if (a.getStep_Ant() == Ant.MAXSTEPSAMEDIR) {
-			a.setStep_Ant(0);
-			a.nextDir();
-		}
-		// sto provando a dare una direzione privilegiata alle formiche per
-		// simulare un movimento più naturale. Aldo
-		if (a.getAntState() == Ant.FOUND)
-			chooseRandomDirection(a);
-		else {
-
-			int k = chooseSearchDirection(a, erasedDirection);
-			if (k != -1) {
-				boolean check = false;
-				Cell currentChoise = null;
-				switch (k) {
-				case Ant.UP:
-
-					currentChoise = world.getCell((int) a.getXPos(),
-							(int) a.getYPos() - 1);
-					if (currentChoise != null) {
-						check = choose(0, -1, currentChoise, a);
-
-					}
-					break;
-				case Ant.DOWN:
-
-					currentChoise = world.getCell((int) a.getXPos(),
-							(int) a.getYPos() + 1);
-					if (currentChoise != null) {
-						check = choose(0, 1, currentChoise, a);
-
-					}
-					break;
-
-				case Ant.LEFT:
-
-					currentChoise = world.getCell((int) a.getXPos() - 1,
-							(int) a.getYPos());
-					if (currentChoise != null)
-						check = choose(-1, 0, currentChoise, a);
-
-					break;
-
-				case Ant.RIGHT:
-
-					currentChoise = world.getCell((int) a.getXPos() + 1,
-							(int) a.getYPos());
-					if (currentChoise != null)
-						check = choose(1, 0, currentChoise, a);
-
-					break;
-				default:
-					break;
-				}
-				if (!check)
-					chooseRandomDirection(a);
-			}
-		}
-
-	}
-
-	private void chooseRandomDirection(Ant a) {
-		ArrayList<Integer> dir = new ArrayList<Integer>();
-		dir.add(Ant.UP);
-		dir.add(Ant.DOWN);
-		dir.add(Ant.LEFT);
-		dir.add(Ant.RIGHT);
-		boolean check = false;
-
-		int k = a.getCurrentDirection();
-		while (dir.size() != 0 && !check) {
-
-			Cell currentChoise = world.getCell((int) a.getXPos(),
-					(int) a.getYPos());
-
-			switch (dir.get(k)) {
-			case Ant.UP:
-
-				currentChoise = world.getCell((int) a.getXPos(),
-						(int) a.getYPos() - 1);
-				if (currentChoise != null) {
-					check = choose(0, -1, currentChoise, a);
-
-				}
-				break;
-			case Ant.DOWN:
-
-				currentChoise = world.getCell((int) a.getXPos(),
-						(int) a.getYPos() + 1);
-				if (currentChoise != null) {
-					check = choose(0, 1, currentChoise, a);
-
-				}
-				break;
-
-			case Ant.LEFT:
-
-				currentChoise = world.getCell((int) a.getXPos() - 1,
-						(int) a.getYPos());
-				if (currentChoise != null)
-					check = choose(-1, 0, currentChoise, a);
-
-				break;
-
-			case Ant.RIGHT:
-
-				currentChoise = world.getCell((int) a.getXPos() + 1,
-						(int) a.getYPos());
-				if (currentChoise != null)
-					check = choose(1, 0, currentChoise, a);
-
-				break;
-			default:
-				break;
-			}
-
-			dir.remove(k);
-			if (dir.size() != 0)
-				k = new Random().nextInt(dir.size());
-
-			if (!check)
-				a.setCurrentDirection(k);
-		}
-
-	}
 
 	// ahahahah XD
 	private boolean contains(int dir, ArrayList<Integer> erasedDirection) {
@@ -410,7 +274,7 @@ public class Manager {
 	private int getSearchPh(int dx, int dy) {
 		int ph = 0;
 		if (world.getCell(dx, dy) != null)
-			ph = (int) world.getCell(dx, dy).getG().getSearchPhLevel();
+			ph = (int) world.getCell(dx, dy).getGroundState().getSearchPhLevel();
 
 		return ph;
 	}
@@ -418,7 +282,7 @@ public class Manager {
 	private int getFoundPh(int dx, int dy) {
 		int ph = 0;
 		if (world.getCell(dx, dy) != null)
-			ph = (int) world.getCell(dx, dy).getG().getFoundPhLevel();
+			ph = (int) world.getCell(dx, dy).getGroundState().getFoundPhLevel();
 
 		return ph;
 	}
@@ -450,52 +314,52 @@ public class Manager {
 
 		Cell current = world.getCell((int) a.getXPos(), (int) a.getYPos());
 
-		if (whereGo.getA() == null) {
 
-			if (a.getLevel() == whereGo.getG().getLevel()) {
+		if (a.getLevel() == whereGo.getGroundState().getLevel()) {
 
-				a.setXPos(whereGo.getX());
-				a.setYPos(whereGo.getY());
+			a.setXPos(whereGo.getX());
+			a.setYPos(whereGo.getY());
+			if (a.getAntState() == Ant.SEARCH) {
+				current.getGroundState().increaseSearchPh(a);
+
+				a.releasePheromones(Ant.RESEARCHPHEROMONE);
+				diffusePheromones(current.getGroundState(), a);
+
+			}
+			if (a.getAntState() == Ant.FOUND) {
+				current.getGroundState().increaseFoundPh(a);
+				a.releasePheromones(Ant.FOUNDPHEROMONE);
+				diffusePheromones(current.getGroundState(), a);
+
+			}
+
+			if (founded(a)) {
 				if (a.getAntState() == Ant.SEARCH) {
-					current.getG().increaseSearchPh(a);
-
-					a.releasePheromones(Ant.RESEARCHPHEROMONE);
-					diffusePheromones(current.getG(), a);
-
+					a.setStep_Ant(0);
+					a.setAntState(Ant.FOUND);
+					a.setCurrentDirection(backDirection(a));
+					a.restartPhRelease(Ant.FOUNDPHEROMONE);
 				}
+			}
+			if (nested(a)) {
 				if (a.getAntState() == Ant.FOUND) {
-					current.getG().increaseFoundPh(a);
-					a.releasePheromones(Ant.FOUNDPHEROMONE);
-					diffusePheromones(current.getG(), a);
+					a.setStep_Ant(0);
+					a.setAntState(Ant.SEARCH);
+					a.setCurrentDirection(backDirection(a));
+					a.restartPhRelease(Ant.RESEARCHPHEROMONE);
 
 				}
 
-				if (founded(a)) {
-					if (a.getAntState() == Ant.SEARCH) {
-						a.setStep_Ant(0);
-						a.setAntState(Ant.FOUND);
-						a.setCurrentDirection(backDirection(a));
-						a.restartPhRelease(Ant.FOUNDPHEROMONE);
-					}
-				}
-				if (nested(a)) {
-					if (a.getAntState() == Ant.FOUND) {
-						a.setStep_Ant(0);
-						a.setAntState(Ant.SEARCH);
-						a.setCurrentDirection(backDirection(a));
-						a.restartPhRelease(Ant.RESEARCHPHEROMONE);
-						//System.out.println("Ho portato il cibo alla tana. "+ a.getName());
-					}
+			}
+			current.removeAntfromArray(a);
+			whereGo.insertAntInArray(a);
 
-				}
-				whereGo.setA(a);
-				current.setA(null);
-			} else if (a.getLevel() < whereGo.getG().getLevel())
-				a.setLevel(a.getLevel() + 1);
-			else
-				a.setLevel(a.getLevel() - 1);
+		} else if (a.getLevel() < whereGo.getGroundState().getLevel())
+			a.setLevel(a.getLevel() + 1);
+		else
+			a.setLevel(a.getLevel() - 1);
 
-		}
+
 
 	}
 
@@ -530,20 +394,20 @@ public class Manager {
 		for (int i = 0; i < World.WIDTH; i++) {
 			for (int j = 0; j < World.HEIGHT; j++) {
 				world.getCell(i, j)
-						.getG()
-						.setFoundPhLevel(
-								world.getCell(i, j).getG().getFoundPhLevel()
-										- PHREDUCTION);
+				.getGroundState()
+				.setFoundPhLevel(
+						world.getCell(i, j).getGroundState().getFoundPhLevel()
+						- PHREDUCTION);
 				world.getCell(i, j)
-						.getG()
-						.setSearchPhLevel(
-								world.getCell(i, j).getG().getSearchPhLevel()
-										- PHREDUCTION);
-				if (world.getCell(i, j).getG().getSearchPhLevel() < 0) {
-					world.getCell(i, j).getG().setSearchPhLevel(0);
+				.getGroundState()
+				.setSearchPhLevel(
+						world.getCell(i, j).getGroundState().getSearchPhLevel()
+						- PHREDUCTION);
+				if (world.getCell(i, j).getGroundState().getSearchPhLevel() < 0) {
+					world.getCell(i, j).getGroundState().setSearchPhLevel(0);
 				}
-				if (world.getCell(i, j).getG().getFoundPhLevel() < 0)
-					world.getCell(i, j).getG().setFoundPhLevel(0);
+				if (world.getCell(i, j).getGroundState().getFoundPhLevel() < 0)
+					world.getCell(i, j).getGroundState().setFoundPhLevel(0);
 			}
 
 		}
@@ -557,9 +421,9 @@ public class Manager {
 		ArrayList<Cell> neighbour = getNeighbour(a.getXPos(), a.getYPos());
 		for (Cell c : neighbour) {
 			if (a.getAntState() == Ant.FOUND)
-				c.getG().increaseNeigFoundPh(a, Ant.FOUNDPHEROMONE);
+				c.getGroundState().increaseNeigFoundPh(a, Ant.FOUNDPHEROMONE);
 			else
-				c.getG().increaseNeigSearchPh(a, Ant.RESEARCHPHEROMONE);
+				c.getGroundState().increaseNeigSearchPh(a, Ant.RESEARCHPHEROMONE);
 		}
 
 	}

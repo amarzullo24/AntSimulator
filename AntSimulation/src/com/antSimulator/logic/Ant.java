@@ -4,7 +4,6 @@ import java.awt.Point;
 import java.util.HashMap;
 import java.util.Random;
 
-import javafx.geometry.VPos;
 
 public class Ant {
 

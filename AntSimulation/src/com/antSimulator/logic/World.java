@@ -16,6 +16,8 @@ public class World {
 	public static final int FOOD_HEIGHT = 5;
 	public static final int NEST_WIDTH=6;
 	public static final int NEST_HEIGHT=6;
+	public static final short MAX_PH_LEVEL = 1000;
+	
 	private Cell[][] matrix;
 	private boolean[][] lockedCell;
 	private BlockingQueue<Ant> ants;
@@ -65,7 +67,7 @@ public class World {
 			while(ants.size() != NUM_OF_ANTS){
 				
 				Ant a = ants.remove();
-				this.matrix[a.getXPos()][a.getYPos()].setA(null);
+				this.matrix[a.getXPos()][a.getYPos()].removeAntfromArray(a);
 			}
 			
 			
@@ -87,15 +89,30 @@ public class World {
 		food.add(new Point(40, 20));
 		food.add(new Point(50, 90));
 
-		nestlevel = getWorld()[nest.x][nest.y].getG().getLevel();
+		nestlevel = getWorld()[nest.x][nest.y].getGroundState().getLevel();
 
 	}
 
 	private void initWorld() {
 		for (int i = 0; i < WIDTH; i++) {
 			for (int j = 0; j < HEIGHT; j++) {
-				matrix[i][j] = new Cell(i, j,
-						new Random().nextInt(GroundState.MAXLEVEL));
+				
+				int random = new Random().nextInt(2);
+				int newVal = 0;
+				
+				if(i-1 >= 0){
+					if(random == 0)
+						newVal = matrix[i-1][j].getGroundState().getLevel()-1;
+					else
+						newVal = matrix[i-1][j].getGroundState().getLevel()+1;
+					
+					if(newVal < 0)
+						newVal = 0;
+					if(newVal > GroundState.MAXLEVEL)
+						newVal--;
+				}
+					
+				matrix[i][j] = new Cell(i, j,newVal);
 				lockedCell[i][j] = false;
 			}
 		}
@@ -121,10 +138,9 @@ public class World {
 
 		if (xPos < 0 || xPos >= WIDTH || yPos < 0 || yPos >= HEIGHT)
 			return null;
-		else if (matrix[xPos][yPos].getG().getLevel() == GroundState.MAXLEVEL)
+		else if (matrix[xPos][yPos].getGroundState().getLevel() == GroundState.MAXLEVEL)
 			return null;
-		else if (matrix[xPos][yPos].getA() != null)
-			return null;
+
 		else
 			return matrix[xPos][yPos];
 	}
@@ -164,7 +180,7 @@ public class World {
 		Manager.getInstance().lock.lock();
 		try {
 
-			while (lockedCell[x][y] && lockedCell[nx][ny])
+			while (lockedCell[x][y] || lockedCell[nx][ny])
 				try {
 
 					Manager.getInstance().condition.signalAll();

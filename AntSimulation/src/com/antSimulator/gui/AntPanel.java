@@ -10,12 +10,12 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
 import javafx.stage.Stage;
 import javafx.stage.WindowEvent;
 
-import com.antSimulator.logic.Ant;
 import com.antSimulator.logic.Cell;
 import com.antSimulator.logic.GroundState;
 import com.antSimulator.logic.Manager;
@@ -63,7 +63,7 @@ public class AntPanel extends Application {
 		hbox.getChildren().add(canvas);
 		hbox.getChildren().add(new RightPanel().getBox());
 		root.getChildren().add(hbox);
-		
+
 		stage.setScene(new Scene(root));
 		stage.show();
 
@@ -77,6 +77,17 @@ public class AntPanel extends Application {
 
 			}
 		});
+		
+		// Clear away portions as the user drags the mouse
+	       canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, 
+	       new EventHandler<MouseEvent>() {
+	           @Override
+	           public void handle(MouseEvent e) {
+	               
+	        	   System.out.println(e.getX()/CELLSIZE + " " + e.getSceneY()/CELLSIZE);
+	        	   //world.getCell(e.getX()/CELLSIZE, e.getSceneY()/CELLSIZE)
+	           }
+	       });
 
 	}
 
@@ -110,43 +121,43 @@ public class AntPanel extends Application {
 		gc.strokeRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
 
 		Manager.getInstance().lock.lock();
+
 		for (int i = 0; i < World.WIDTH; i++) {
 			for (int j = 0; j < World.HEIGHT; j++) {
-				Cell c = world.getCell(i, j);
-				GroundState g = c.getG();
+
+				Cell cell = world.getCell(i, j);
+				GroundState g = cell.getGroundState();
+				
+				gc.setGlobalAlpha((double)g.getLevel()/((double)GroundState.MAXLEVEL*2));
+				gc.setFill(Color.GRAY);
+				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
+						CELLSIZE, 0, 0);
+
 				gc.setGlobalAlpha(g.getFoundPhLevel() / 1000);
 				gc.setFill(Color.GREENYELLOW);
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
+
 				gc.setGlobalAlpha(g.getSearchPhLevel()/1000);
-				gc.setFill(Color.GRAY);
+				gc.setFill(Color.BROWN);
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
-				if (g.getLevel() == GroundState.MAXLEVEL) {
+
+
+				if (cell.getAntsSet().size()>0){
 
 					gc.setGlobalAlpha(1.0);
-					gc.setFill(Color.BLACK);
-					gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
-							CELLSIZE, 10, 10);
-
+					gc.setFill(Color.RED);
 				}
-				if (c.getA() != null) {
-					
-					gc.setGlobalAlpha(1.0);
-					if (c.getA().getAntState() == Ant.SEARCH)
-						gc.setFill(Color.RED);
-					else
-						gc.setFill(Color.BLUE);
 
-					gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
-							CELLSIZE, 10, 10);
-					
+				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
+						CELLSIZE, 10, 10);
 
-				}// if
 
 			}// for
 
 		}// for
+
 		gc.setGlobalAlpha(1.0);
 		for (Point food : world.getFood()) {
 			gc.setFill(Color.GREEN);

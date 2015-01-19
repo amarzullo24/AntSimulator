@@ -1,32 +1,45 @@
 package com.antSimulator.logic;
 
+import java.util.HashMap;
+
 public class Cell {
  
-	private Ant a;
-	private GroundState g;
+	private HashMap<String, Ant> antsSet;
+	private GroundState groundState;
 	private int x;
 	private int y;
 	
 	public Cell(int x, int y,int level) {
 		this.setX(x);
 		this.setY(y);
-		g=new GroundState(level);
+		antsSet = new HashMap<String, Ant>();
+		groundState = new GroundState(level);
 	}
 
-	public Ant getA() {
-		return a;
+	public HashMap<String, Ant> getAntsSet() {
+		return antsSet;
 	}
 
-	public void setA(Ant a) {
-		this.a = a;
+	public void setA(HashMap<String, Ant> a) {
+		this.antsSet = a;
+	}
+	
+	public void insertAntInArray(Ant ant){
+		
+		this.antsSet.put(ant.getName(), ant);
+	}
+	
+	public void removeAntfromArray(Ant ant){
+		
+		this.antsSet.remove(ant.getName());
 	}
 
-	public GroundState getG() {
-		return g;
+	public GroundState getGroundState() {
+		return groundState;
 	}
 
-	public void setG(GroundState g) {
-		this.g = g;
+	public void setGroundState(GroundState g) {
+		this.groundState = g;
 	}
 
 	public int getX() {
