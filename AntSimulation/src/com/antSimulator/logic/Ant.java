@@ -19,7 +19,7 @@ public class Ant {
 
 	public static final String RESEARCHPHEROMONE = "researchPheromone";
 	public static final String FOUNDPHEROMONE = "foundPheromone";
-	public static final int MAXSTEPSAMEDIR = 20;
+	public static final int MAXSTEPSAMEDIR = 60;
 
 	private int direction;
 	private int antState;

@@ -13,6 +13,7 @@ public class Worker extends Thread {
 	@Override
 	public void run() {
 		try {
+			sleep(1000);
 			while (Manager.ISACTIVE) {
 				
 				Manager.getInstance().lock.lock();
