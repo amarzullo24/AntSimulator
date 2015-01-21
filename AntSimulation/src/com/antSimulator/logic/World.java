@@ -12,8 +12,8 @@ public class World {
 	public static final short MAX_NUM_OF_ANT = 100;
 	public static final int WIDTH = 100;
 	public static final int HEIGHT = 100;
-	public static final int FOOD_WIDTH = 5;
-	public static final int FOOD_HEIGHT = 5;
+	public static final int FOOD_WIDTH = 10;
+	public static final int FOOD_HEIGHT = 15;
 	public static final int NEST_WIDTH=6;
 	public static final int NEST_HEIGHT=6;
 	public static final short MAX_PH_LEVEL = 1000;
@@ -97,20 +97,20 @@ public class World {
 		for (int i = 0; i < WIDTH; i++) {
 			for (int j = 0; j < HEIGHT; j++) {
 				
-				int random = new Random().nextInt(2);
 				int newVal = 0;
 				
-				if(i-1 >= 0){
-					if(random == 0)
-						newVal = matrix[i-1][j].getGroundState().getLevel()-1;
-					else
-						newVal = matrix[i-1][j].getGroundState().getLevel()+1;
-					
-					if(newVal < 0)
-						newVal = 0;
-					if(newVal > GroundState.MAXLEVEL)
-						newVal--;
-				}
+//				int random = new Random().nextInt(2);
+//				if(i-1 >= 0){
+//					if(random == 0)
+//						newVal = matrix[i-1][j].getGroundState().getLevel()-1;
+//					else
+//						newVal = matrix[i-1][j].getGroundState().getLevel()+1;
+//					
+//					if(newVal < 0)
+//						newVal = 0;
+//					if(newVal > GroundState.MAXLEVEL)
+//						newVal--;
+//				}
 					
 				matrix[i][j] = new Cell(i, j,newVal);
 				lockedCell[i][j] = false;

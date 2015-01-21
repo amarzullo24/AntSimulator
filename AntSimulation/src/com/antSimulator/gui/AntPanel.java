@@ -58,7 +58,7 @@ public class AntPanel extends Application {
 		initThread();
 
 		root.getChildren().add(canvas);
-		
+
 		HBox hbox = new HBox();
 		hbox.getChildren().add(canvas);
 		hbox.getChildren().add(new RightPanel().getBox());
@@ -77,17 +77,61 @@ public class AntPanel extends Application {
 
 			}
 		});
-		
+
 		// Clear away portions as the user drags the mouse
-	       canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, 
-	       new EventHandler<MouseEvent>() {
-	           @Override
-	           public void handle(MouseEvent e) {
-	               
-	        	   System.out.println(e.getX()/CELLSIZE + " " + e.getSceneY()/CELLSIZE);
-	        	   //world.getCell(e.getX()/CELLSIZE, e.getSceneY()/CELLSIZE)
-	           }
-	       });
+		canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED, 
+				new EventHandler<MouseEvent>() {
+			@Override
+			public void handle(MouseEvent e) {
+
+				short currentX = (short) (e.getX()/CELLSIZE);
+				short currentY = (short) (e.getY()/CELLSIZE);
+
+				Cell currentCell = world.getCell(currentX, currentY); 
+				
+				if(currentCell == null)
+					return;
+				
+					int currentLevel = currentCell.getGroundState().getLevel()+1;
+					currentCell.getGroundState().setLevel(currentLevel++);
+
+				int i = 1;
+				while(i < 5){
+
+					for(int j = currentX-i; j<=currentX+i; j++){
+
+						currentCell = world.getCell(j, currentY-i);
+						if(currentCell != null){
+							currentLevel = currentCell.getGroundState().getLevel()+1;
+							currentCell.getGroundState().setLevel(currentLevel);
+						}
+
+						currentCell = world.getCell(j, currentY+i);
+						if(currentCell != null){
+							currentLevel = currentCell.getGroundState().getLevel()+1;
+							currentCell.getGroundState().setLevel(currentLevel);
+						}
+					}
+
+					for(int j = currentY-i; j<=currentY+i; j++){
+
+						currentCell = world.getCell(currentX-i, j);
+						if(currentCell != null){
+							currentLevel = currentCell.getGroundState().getLevel()+1;
+							world.getCell(currentX-i, j).getGroundState().setLevel(currentLevel);
+						}
+
+						currentCell = world.getCell(currentX+i, j);
+						if(currentCell != null){
+							currentLevel = currentCell.getGroundState().getLevel()+1;
+							currentCell.getGroundState().setLevel(currentLevel);
+						}
+					}
+
+					i++;
+				}
+			}
+		});
 
 	}
 
@@ -127,7 +171,7 @@ public class AntPanel extends Application {
 
 				Cell cell = world.getCell(i, j);
 				GroundState g = cell.getGroundState();
-				
+
 				gc.setGlobalAlpha((double)g.getLevel()/((double)GroundState.MAXLEVEL*2));
 				gc.setFill(Color.GRAY);
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
