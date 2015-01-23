@@ -1,7 +1,6 @@
 package com.antSimulator.logic;
 
 import java.awt.Point;
-import java.util.HashMap;
 import java.util.Random;
 
 
@@ -17,8 +16,8 @@ public class Ant {
 	public static final int PHDESEASE = 10;
 	public static final int MAXPHEROMONE = 500;
 
-	public static final String RESEARCHPHEROMONE = "researchPheromone";
-	public static final String FOUNDPHEROMONE = "foundPheromone";
+	//public static final String RESEARCHPHEROMONE = "researchPheromone";
+	//public static final String FOUNDPHEROMONE = "foundPheromone";
 	public static final int MAXSTEPSAMEDIR = 60;
 
 	private int direction;
@@ -29,10 +28,9 @@ public class Ant {
 	private int step_Ant = 0;
 	private Random r;
 	private int currentDirection = new Random().nextInt(4);
-	private HashMap<String, Pheromone> pheromones;
+	private int currentPH;
 
 	public Ant(int nestLevel, Point pos, int num) {
-		pheromones = new HashMap<String, Pheromone>();
 		r = new Random();
 		setDirection(r.nextInt(4));
 		setAntState(SEARCH);
@@ -44,8 +42,7 @@ public class Ant {
 	}
 
 	private void inizializePheromone() {
-		pheromones.put(FOUNDPHEROMONE, new Pheromone(MAXPHEROMONE));
-		pheromones.put(RESEARCHPHEROMONE, new Pheromone(MAXPHEROMONE));
+		currentPH=MAXPHEROMONE;
 	}
 
 	private Point setPosition(Point pos) {
@@ -56,7 +53,7 @@ public class Ant {
 	}
 
 	public Ant(Ant ant) {
-        this.pheromones=ant.pheromones;
+        this.currentPH=ant.getCurrentPH();
 		this.direction = ant.direction;
 		this.antState = ant.antState;
 		this.setLevel(ant.getLevel());
@@ -64,12 +61,12 @@ public class Ant {
 		this.name = ant.name;
 	}
 
-	public void releasePheromones(String typePh){
-		pheromones.get(typePh).reduceQuantity(PHDESEASE);
+	public void releasePheromones(){
+		currentPH-=PHDESEASE;
 	}
 
-	public void restartPhRelease(String typePh) {
-		pheromones.get(typePh).setQuantity(MAXPHEROMONE);
+	public void restartPhRelease() {
+		currentPH=MAXPHEROMONE;
 	}
 
 	public void nextStep() {
@@ -146,12 +143,12 @@ public class Ant {
 		setCurrentDirection(r.nextInt(4));
 	}
 
-	public HashMap<String, Pheromone> getPheromones() {
-		return pheromones;
+	public int getCurrentPH() {
+		return currentPH;
 	}
 
-	public void setPheromones(HashMap<String, Pheromone> pheromones) {
-		this.pheromones = pheromones;
+	public void setCurrentPH(int currentPH) {
+		this.currentPH = currentPH;
 	}
 
 }

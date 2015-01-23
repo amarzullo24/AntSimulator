@@ -14,9 +14,10 @@ public class World {
 	public static final int HEIGHT = 100;
 	public static final int FOOD_WIDTH = 10;
 	public static final int FOOD_HEIGHT = 15;
-	public static final int NEST_WIDTH=6;
-	public static final int NEST_HEIGHT=6;
+	public static final int NEST_WIDTH = 6;
+	public static final int NEST_HEIGHT = 6;
 	public static final short MAX_PH_LEVEL = 1000;
+
 	
 	
 	private Cell[][] matrix;
@@ -47,12 +48,12 @@ public class World {
 			}
 
 	}
-	
-	public void respawnAnts(){
-		
+
+	public void respawnAnts() {
+
 		Manager.getInstance().lock.lock();
-		
-		if(ants.size() < NUM_OF_ANTS){
+
+		if (ants.size() < NUM_OF_ANTS) {
 			for (int i = ants.size(); i < NUM_OF_ANTS; i++)
 				try {
 
@@ -62,22 +63,19 @@ public class World {
 				} catch (InterruptedException e) {
 					e.printStackTrace();
 				}
-		}
-		else{
-			
-			while(ants.size() != NUM_OF_ANTS){
-				
+		} else {
+
+			while (ants.size() != NUM_OF_ANTS) {
+
 				Ant a = ants.remove();
 				this.matrix[a.getXPos()][a.getYPos()].removeAntfromArray(a);
 			}
-			
-			
+
 		}
-		
+
 		Manager.getInstance().lock.unlock();
-		
+
 	}
-	
 
 	private void loadWorld() {
 
@@ -97,23 +95,22 @@ public class World {
 	private void initWorld() {
 		for (int i = 0; i < WIDTH; i++) {
 			for (int j = 0; j < HEIGHT; j++) {
-				
 				int newVal = 0;
-				
+
 //				int random = new Random().nextInt(2);
-//				if(i-1 >= 0){
-//					if(random == 0)
-//						newVal = matrix[i-1][j].getGroundState().getLevel()-1;
+//				if (i - 1 >= 0) {
+//					if (random == 0)
+//						newVal = matrix[i - 1][j].getGroundState().getLevel() - 1;
 //					else
-//						newVal = matrix[i-1][j].getGroundState().getLevel()+1;
-//					
-//					if(newVal < 0)
+//						newVal = matrix[i - 1][j].getGroundState().getLevel() + 1;
+//
+//					if (newVal < 0)
 //						newVal = 0;
-//					if(newVal > GroundState.MAXLEVEL)
+//					if (newVal > GroundState.MAXLEVEL)
 //						newVal--;
 //				}
-					
-				matrix[i][j] = new Cell(i, j,newVal);
+
+				matrix[i][j] = new Cell(i, j, newVal);
 				lockedCell[i][j] = false;
 			}
 		}

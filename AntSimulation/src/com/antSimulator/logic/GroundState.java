@@ -18,12 +18,12 @@ public class GroundState {
 
 	public void increaseFoundPh(Ant a){
 		
-			setFoundPhLevel(getFoundPhLevel() + a.getPheromones().get(Ant.FOUNDPHEROMONE).getQuantity());
+			setFoundPhLevel(getFoundPhLevel() + a.getCurrentPH());
 	}
 
 	public void increaseSearchPh(Ant a){
 
-			setSearchPhLevel(getSearchPhLevel()+ a.getPheromones().get(Ant.RESEARCHPHEROMONE).getQuantity());
+			setSearchPhLevel(getSearchPhLevel()+ a.getCurrentPH());
 	}
 
 	public int getLevel() {
@@ -50,14 +50,14 @@ public class GroundState {
 		this.searchPhLevel = searchPhLevel;
 	}
 
-	public void increaseNeigFoundPh(Ant a,String type) {
-		int incrPh=a.getPheromones().get(type).getQuantity()/10;
+	public void increaseNeigFoundPh(Ant a) {
+		int incrPh=a.getCurrentPH()/10;
 		setFoundPhLevel(getFoundPhLevel()+incrPh);
 
 	}
 
-	public void increaseNeigSearchPh(Ant a,String type) {
-		int incrPh=a.getPheromones().get(type).getQuantity()/10;
+	public void increaseNeigSearchPh(Ant a) {
+		int incrPh=a.getCurrentPH()/10;
 		setSearchPhLevel(getSearchPhLevel()+ incrPh);
 
 	}

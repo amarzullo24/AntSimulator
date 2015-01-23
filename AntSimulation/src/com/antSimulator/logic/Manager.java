@@ -9,12 +9,12 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class Manager {
 
-	public static int PHREDUCTION = 30;
-	public static int UPDATE_TIME = 200;
+	public static int PHREDUCTION = 20;
+	public static int UPDATE_TIME = 250;
 
-	public static final int CORE_NUMBER = 10;
+	public static final int CORE_NUMBER = 7;
 	public static boolean ISACTIVE = true;
-	public static final int SLEEP_TIME =50;
+	public static final int SLEEP_TIME = 50;
 
 	public boolean updating;
 
@@ -92,8 +92,8 @@ public class Manager {
 			default:
 				break;
 			}
-		
-				check = choose(currentChoise, a);
+
+			check = choose(currentChoise, a);
 			if (!check)
 				erasedDirection.add(k);
 
@@ -302,30 +302,29 @@ public class Manager {
 		Cell current = world.getCell((int) a.getXPos(), (int) a.getYPos());
 
 		if (a.getLevel() == whereGo.getGroundState().getLevel()) {
-	
+
 			a.setXPos(whereGo.getX());
 			a.setYPos(whereGo.getY());
 			if (a.getAntState() == Ant.SEARCH) {
 				current.getGroundState().increaseSearchPh(a);
-				a.releasePheromones(Ant.RESEARCHPHEROMONE);
+				a.releasePheromones();
 				diffusePheromones(current.getGroundState(), a);
 				if (founded(a)) {
 					a.setStep_Ant(0);
 					a.setAntState(Ant.FOUND);
 					a.setCurrentDirection(backDirection(a));
-					a.restartPhRelease(Ant.FOUNDPHEROMONE);
+					a.restartPhRelease();
 				}
 
-			}
-			if (a.getAntState() == Ant.FOUND) {
+			} else if (a.getAntState() == Ant.FOUND) {
 				current.getGroundState().increaseFoundPh(a);
-				a.releasePheromones(Ant.FOUNDPHEROMONE);
+				a.releasePheromones();
 				diffusePheromones(current.getGroundState(), a);
 				if (nested(a)) {
 					a.setStep_Ant(0);
 					a.setAntState(Ant.SEARCH);
 					a.setCurrentDirection(backDirection(a));
-					a.restartPhRelease(Ant.RESEARCHPHEROMONE);
+					a.restartPhRelease();
 
 				}
 
@@ -342,9 +341,9 @@ public class Manager {
 
 	private boolean nested(Ant a) {
 		Point nest = world.getNest();
-		if (nest.x + World.NEST_WIDTH >= a.getXPos() && nest.x <= a.getXPos()
-				&& nest.y <= a.getYPos()
-				&& nest.y + World.NEST_HEIGHT >= a.getYPos())
+		if (nest.x + World.NEST_WIDTH > a.getXPos() && nest.x < a.getXPos()
+				&& nest.y < a.getYPos()
+				&& nest.y + World.NEST_HEIGHT > a.getYPos())
 			return true;
 		return false;
 	}
@@ -352,10 +351,10 @@ public class Manager {
 	private boolean founded(Ant a) {
 		ArrayList<Point> foods = world.getFood();
 		for (Point food : foods) {
-			if (food.getX() + World.FOOD_WIDTH >= a.getXPos()
-					&& food.getX() <= a.getXPos()
-					&& food.getY() + World.FOOD_HEIGHT >= a.getYPos()
-					&& food.getY() <= a.getYPos()) {
+			if (food.getX() + World.FOOD_WIDTH > a.getXPos()
+					&& food.getX() < a.getXPos()
+					&& food.getY() + World.FOOD_HEIGHT > a.getYPos()
+					&& food.getY() < a.getYPos()) {
 
 				return true;
 			}
@@ -400,10 +399,9 @@ public class Manager {
 		ArrayList<Cell> neighbour = getNeighbour(a.getXPos(), a.getYPos());
 		for (Cell c : neighbour) {
 			if (a.getAntState() == Ant.FOUND)
-				c.getGroundState().increaseNeigFoundPh(a, Ant.FOUNDPHEROMONE);
+				c.getGroundState().increaseNeigFoundPh(a);
 			else
-				c.getGroundState().increaseNeigSearchPh(a,
-						Ant.RESEARCHPHEROMONE);
+				c.getGroundState().increaseNeigSearchPh(a);
 		}
 
 	}
