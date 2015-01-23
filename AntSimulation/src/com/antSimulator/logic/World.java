@@ -18,6 +18,7 @@ public class World {
 	public static final int NEST_HEIGHT=6;
 	public static final short MAX_PH_LEVEL = 1000;
 	
+	
 	private Cell[][] matrix;
 	private boolean[][] lockedCell;
 	private BlockingQueue<Ant> ants;
