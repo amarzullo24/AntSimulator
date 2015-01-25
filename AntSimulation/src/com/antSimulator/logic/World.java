@@ -10,10 +10,10 @@ public class World {
 
 	public static int NUM_OF_ANTS = 10;
 	public static final short MAX_NUM_OF_ANT = 100;
-	public static final int WIDTH = 100;
-	public static final int HEIGHT = 100;
-	public static final int FOOD_WIDTH = 10;
-	public static final int FOOD_HEIGHT = 15;
+	public static final int WIDTH = 50;
+	public static final int HEIGHT = 50;
+	public static final int FOOD_WIDTH = 5;
+	public static final int FOOD_HEIGHT = 5;
 	public static final int NEST_WIDTH = 6;
 	public static final int NEST_HEIGHT = 6;
 	public static final short MAX_PH_LEVEL = 1000;
@@ -85,8 +85,8 @@ public class World {
 
 		nest = new Point(10, 15);
 		food = new ArrayList<Point>();
-		food.add(new Point(40, 20));
-		food.add(new Point(50, 90));
+		food.add(new Point(45, 20));
+		food.add(new Point(10, 40));
 
 		nestlevel = getWorld()[nest.x][nest.y].getGroundState().getLevel();
 
