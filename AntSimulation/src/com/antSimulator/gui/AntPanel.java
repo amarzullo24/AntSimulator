@@ -187,6 +187,10 @@ public class AntPanel extends Application {
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
 
+				
+				gc.setGlobalAlpha(cell.getFood()/Cell.MaxFood);
+				gc.setFill(Color.GREEN);
+				gc.fillRect(i* CELLSIZE, j* CELLSIZE,CELLSIZE , CELLSIZE );
 
 				if (cell.getAntsSet().size()>0){
 
@@ -201,13 +205,7 @@ public class AntPanel extends Application {
 			}// for
 
 		}// for
-
 		gc.setGlobalAlpha(1.0);
-		for (Point food : world.getFood()) {
-			gc.setFill(Color.GREEN);
-			gc.fillRoundRect(food.getX() * CELLSIZE, food.getY() * CELLSIZE,
-					CELLSIZE * World.FOOD_WIDTH, CELLSIZE * World.FOOD_HEIGHT, 10, 10);
-		}
 		gc.setFill(Color.BROWN);
 		gc.fillRoundRect(world.getNest().getX() * CELLSIZE, world.getNest()
 				.getY() * CELLSIZE, CELLSIZE * World.NEST_WIDTH, CELLSIZE * World.NEST_HEIGHT, 10, 10);

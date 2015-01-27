@@ -7,8 +7,6 @@ public class GroundState {
 	private float foundPhLevel;
 	private float searchPhLevel;
 
-
-
 	public GroundState(int l) {
 		setLevel(l);
 		setFoundPhLevel(0);
@@ -16,14 +14,25 @@ public class GroundState {
 
 	}
 
-	public void increaseFoundPh(Ant a){
-		
-			setFoundPhLevel(getFoundPhLevel() + a.getCurrentPH());
+	public void increaseFoundPh(Ant a) {
+
+		foundPhLevel+=a.getCurrentPH();
 	}
 
-	public void increaseSearchPh(Ant a){
+	public void increaseSearchPh(Ant a) {
 
-			setSearchPhLevel(getSearchPhLevel()+ a.getCurrentPH());
+		searchPhLevel+=a.getCurrentPH();
+	}
+
+	public void decreasePh(int decrease) {
+		if (foundPhLevel > 0)
+			foundPhLevel -= decrease;
+		else
+			foundPhLevel = 0;
+		if (searchPhLevel > 0)
+			searchPhLevel -= decrease;
+		else
+			searchPhLevel = 0;
 	}
 
 	public int getLevel() {
@@ -51,14 +60,15 @@ public class GroundState {
 	}
 
 	public void increaseNeigFoundPh(Ant a) {
-		int incrPh=a.getCurrentPH()/10;
-		setFoundPhLevel(getFoundPhLevel()+incrPh);
+		int incrPh = a.getCurrentPH() / 10;
+		setFoundPhLevel(getFoundPhLevel() + incrPh);
 
 	}
 
 	public void increaseNeigSearchPh(Ant a) {
-		int incrPh=a.getCurrentPH()/10;
-		setSearchPhLevel(getSearchPhLevel()+ incrPh);
+		int incrPh = a.getCurrentPH() / 10;
+		setSearchPhLevel(getSearchPhLevel() + incrPh);
 
 	}
+
 }

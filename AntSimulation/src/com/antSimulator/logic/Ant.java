@@ -27,6 +27,7 @@ public class Ant {
 	private String name;
 	private int step_Ant = 0;
 	private Random r;
+	private int maxPheromones=MAXPHEROMONE;
 	private int currentDirection = new Random().nextInt(4);
 	private int currentPH;
 
@@ -42,9 +43,15 @@ public class Ant {
 	}
 
 	private void inizializePheromone() {
-		currentPH=MAXPHEROMONE;
+		currentPH=maxPheromones;
 	}
 
+	public void setMaxPheromones(){
+		if(currentPH>0)
+			maxPheromones-=currentPH;
+		else
+			maxPheromones+=MAXPHEROMONE;
+	}
 	private Point setPosition(Point pos) {
 		int x = new Random().nextInt(World.NEST_WIDTH);
 		int y = new Random().nextInt(World.NEST_HEIGHT);

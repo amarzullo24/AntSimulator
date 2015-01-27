@@ -305,22 +305,26 @@ public class Manager {
 
 			a.setXPos(whereGo.getX());
 			a.setYPos(whereGo.getY());
+
 			if (a.getAntState() == Ant.SEARCH) {
-				current.getGroundState().increaseSearchPh(a);
-				a.releasePheromones();
+				whereGo.getGroundState().increaseSearchPh(a);
 				diffusePheromones(current.getGroundState(), a);
-				if (founded(a)) {
+				a.releasePheromones();
+
+				if (whereGo.getFood() > 0) {
+					a.setMaxPheromones();
 					a.setStep_Ant(0);
 					a.setAntState(Ant.FOUND);
+					whereGo.decreaseFood();
 					a.setCurrentDirection(backDirection(a));
 					a.restartPhRelease();
 				}
-
 			} else if (a.getAntState() == Ant.FOUND) {
-				current.getGroundState().increaseFoundPh(a);
-				a.releasePheromones();
+				whereGo.getGroundState().increaseFoundPh(a);
 				diffusePheromones(current.getGroundState(), a);
+				a.releasePheromones();
 				if (nested(a)) {
+					a.setMaxPheromones();
 					a.setStep_Ant(0);
 					a.setAntState(Ant.SEARCH);
 					a.setCurrentDirection(backDirection(a));
@@ -348,20 +352,6 @@ public class Manager {
 		return false;
 	}
 
-	private boolean founded(Ant a) {
-		ArrayList<Point> foods = world.getFood();
-		for (Point food : foods) {
-			if (food.getX() + World.FOOD_WIDTH > a.getXPos()
-					&& food.getX() < a.getXPos()
-					&& food.getY() + World.FOOD_HEIGHT > a.getYPos()
-					&& food.getY() < a.getYPos()) {
-
-				return true;
-			}
-		}
-		return false;
-	}
-
 	public void update() {
 
 		lock.lock();
@@ -369,23 +359,7 @@ public class Manager {
 
 		for (int i = 0; i < World.WIDTH; i++) {
 			for (int j = 0; j < World.HEIGHT; j++) {
-				world.getCell(i, j)
-						.getGroundState()
-						.setFoundPhLevel(
-								world.getCell(i, j).getGroundState()
-										.getFoundPhLevel()
-										- PHREDUCTION);
-				world.getCell(i, j)
-						.getGroundState()
-						.setSearchPhLevel(
-								world.getCell(i, j).getGroundState()
-										.getSearchPhLevel()
-										- PHREDUCTION);
-				if (world.getCell(i, j).getGroundState().getSearchPhLevel() < 0) {
-					world.getCell(i, j).getGroundState().setSearchPhLevel(0);
-				}
-				if (world.getCell(i, j).getGroundState().getFoundPhLevel() < 0)
-					world.getCell(i, j).getGroundState().setFoundPhLevel(0);
+				world.getCell(i, j).decreaseCellPheromones(PHREDUCTION);
 			}
 
 		}
@@ -408,28 +382,28 @@ public class Manager {
 
 	private ArrayList<Cell> getNeighbour(int xPos, int yPos) {
 		ArrayList<Cell> neig = new ArrayList<Cell>();
-		if (world.getCell(xPos + 1, yPos) != null) {
+		if (world.getAvailableCell(xPos + 1, yPos) != null) {
 			neig.add(world.getCell(xPos + 1, yPos));
 		}
-		if (world.getCell(xPos - 1, yPos) != null) {
+		if (world.getAvailableCell(xPos - 1, yPos) != null) {
 			neig.add(world.getCell(xPos - 1, yPos));
 		}
-		if (world.getCell(xPos + 1, yPos - 1) != null) {
+		if (world.getAvailableCell(xPos + 1, yPos - 1) != null) {
 			neig.add(world.getCell(xPos + 1, yPos - 1));
 		}
-		if (world.getCell(xPos - 1, yPos - 1) != null) {
+		if (world.getAvailableCell(xPos - 1, yPos - 1) != null) {
 			neig.add(world.getCell(xPos - 1, yPos - 1));
 		}
-		if (world.getCell(xPos + 1, yPos + 1) != null) {
+		if (world.getAvailableCell(xPos + 1, yPos + 1) != null) {
 			neig.add(world.getCell(xPos + 1, yPos + 1));
 		}
-		if (world.getCell(xPos - 1, yPos + 1) != null) {
+		if (world.getAvailableCell(xPos - 1, yPos + 1) != null) {
 			neig.add(world.getCell(xPos - 1, yPos + 1));
 		}
-		if (world.getCell(xPos, yPos + 1) != null) {
+		if (world.getAvailableCell(xPos, yPos + 1) != null) {
 			neig.add(world.getCell(xPos, yPos + 1));
 		}
-		if (world.getCell(xPos, yPos - 1) != null) {
+		if (world.getAvailableCell(xPos, yPos - 1) != null) {
 			neig.add(world.getCell(xPos, yPos - 1));
 		}
 		return neig;

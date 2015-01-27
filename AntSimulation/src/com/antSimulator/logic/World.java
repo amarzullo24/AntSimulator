@@ -18,14 +18,13 @@ public class World {
 	public static final int NEST_HEIGHT = 6;
 	public static final short MAX_PH_LEVEL = 1000;
 
-	
-	
 	private Cell[][] matrix;
 	private boolean[][] lockedCell;
 	private BlockingQueue<Ant> ants;
 	private Point nest;
 	private int nestlevel;
-	private ArrayList<Point> food;
+
+	// private ArrayList<Point> food;
 
 	public World() {
 
@@ -84,11 +83,19 @@ public class World {
 		initWorld();
 
 		nest = new Point(10, 15);
-		food = new ArrayList<Point>();
-		food.add(new Point(45, 20));
-		food.add(new Point(10, 40));
+		initFood();
+		// food = new ArrayList<Point>();
+		// food.add(new Point(45, 20));
+		// food.add(new Point(10, 40));
 
 		nestlevel = getWorld()[nest.x][nest.y].getGroundState().getLevel();
+
+	}
+
+	private void initFood() {
+		for (int i = 0; i < FOOD_WIDTH; i++)
+			for (int j = 0; j < FOOD_HEIGHT; j++)
+				matrix[45+i][20+j].insertFood();
 
 	}
 
@@ -97,18 +104,18 @@ public class World {
 			for (int j = 0; j < HEIGHT; j++) {
 				int newVal = 0;
 
-//				int random = new Random().nextInt(2);
-//				if (i - 1 >= 0) {
-//					if (random == 0)
-//						newVal = matrix[i - 1][j].getGroundState().getLevel() - 1;
-//					else
-//						newVal = matrix[i - 1][j].getGroundState().getLevel() + 1;
-//
-//					if (newVal < 0)
-//						newVal = 0;
-//					if (newVal > GroundState.MAXLEVEL)
-//						newVal--;
-//				}
+				// int random = new Random().nextInt(2);
+				// if (i - 1 >= 0) {
+				// if (random == 0)
+				// newVal = matrix[i - 1][j].getGroundState().getLevel() - 1;
+				// else
+				// newVal = matrix[i - 1][j].getGroundState().getLevel() + 1;
+				//
+				// if (newVal < 0)
+				// newVal = 0;
+				// if (newVal > GroundState.MAXLEVEL)
+				// newVal--;
+				// }
 
 				matrix[i][j] = new Cell(i, j, newVal);
 				lockedCell[i][j] = false;
@@ -119,7 +126,7 @@ public class World {
 
 			int i = new Random().nextInt(HEIGHT);
 			int j = new Random().nextInt(WIDTH);
-			matrix[i][j] = new Cell(i, j, GroundState.MAXLEVEL);
+			matrix[i][j].getGroundState().setLevel(GroundState.MAXLEVEL);
 		}
 
 	}
@@ -208,14 +215,6 @@ public class World {
 
 	public void setCell(Cell cell) {
 		this.matrix[cell.getX()][cell.getY()] = cell;
-	}
-
-	public ArrayList<Point> getFood() {
-		return food;
-	}
-
-	public void setFood(ArrayList<Point> food) {
-		this.food = food;
 	}
 
 	public Point getNest() {
