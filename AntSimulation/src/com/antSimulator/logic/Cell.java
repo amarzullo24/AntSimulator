@@ -21,6 +21,9 @@ public class Cell {
 		groundState = new GroundState(level);
 	}
 
+	public int increaseGroundLevel(){
+		 return groundState.increaseLevel();
+	}
 	public void decreaseCellPheromones(int decrease) {
 		groundState.decreasePh(decrease);
 	}
@@ -53,6 +56,10 @@ public class Cell {
 
 	public void insertFood() {
 		food = MaxFood;
+	}
+
+	public void removeFood() {
+		food = 0;
 	}
 
 	public void decreaseFood() {

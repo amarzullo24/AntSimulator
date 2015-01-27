@@ -16,12 +16,12 @@ public class GroundState {
 
 	public void increaseFoundPh(Ant a) {
 
-		foundPhLevel+=a.getCurrentPH();
+		foundPhLevel += a.getCurrentPH();
 	}
 
 	public void increaseSearchPh(Ant a) {
 
-		searchPhLevel+=a.getCurrentPH();
+		searchPhLevel += a.getCurrentPH();
 	}
 
 	public void decreasePh(int decrease) {
@@ -33,6 +33,13 @@ public class GroundState {
 			searchPhLevel -= decrease;
 		else
 			searchPhLevel = 0;
+	}
+
+	public int increaseLevel() {
+		if (level < MAXLEVEL)
+			return level++;
+		else
+			return level;
 	}
 
 	public int getLevel() {

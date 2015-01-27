@@ -47,6 +47,22 @@ public class Manager {
 
 	}
 
+	/*
+	 * public void moveAnt(Ant a){ ArrayList<Integer> erasedDirection = new
+	 * ArrayList<Integer>(); erasedDirection.add(backDirection(a));
+	 * a.nextStep();
+	 * 
+	 * if (a.getStep_Ant() == Ant.MAXSTEPSAMEDIR) { a.setStep_Ant(0);
+	 * erasedDirection.add(a.getCurrentDirection()); }
+	 * 
+	 * boolean check=false; Cell currentChoise=null; while(!check &&
+	 * !(erasedDirection.size()==4)){ if(a.getAntState()== Ant.SEARCH)
+	 * currentChoise=chooseSearchDirection(a,erasedDirection); else
+	 * if(a.getAntState()==Ant.FOUND) currentChoise=chooseFoundDirection(a,
+	 * erasedDirection); check=choose(currentChoise, a); if(!check)
+	 * erasedDirection.add(a.getCurrentDirection()); } }
+	 */
+
 	public void moveAnts(Ant a) {
 		ArrayList<Integer> erasedDirection = new ArrayList<Integer>();
 		erasedDirection.add(backDirection(a));
@@ -62,12 +78,14 @@ public class Manager {
 		Cell currentChoise = null;
 		while (!check && !(erasedDirection.size() == 4)) {
 			if (a.getAntState() == Ant.SEARCH) {
-				k = chooseSearchDirection(a, erasedDirection);
+				if (!nearFood(a))
+					k = chooseSearchDirection(a, erasedDirection);
 			} else if (a.getAntState() == Ant.FOUND) {
-				k = chooseFoundDirection(a, erasedDirection);
+				if (!nearNest(a))
+					k = chooseFoundDirection(a, erasedDirection);
 
 			}
-			switch (k) {
+			switch (a.getCurrentDirection()) {
 			case Ant.UP:
 
 				currentChoise = world.getAvailableCell((int) a.getXPos(),
@@ -98,6 +116,57 @@ public class Manager {
 				erasedDirection.add(k);
 
 		}
+	}
+
+	private boolean nearNest(Ant a) {
+
+		if (nested(a.getXPos()+1, a.getYPos())) {
+			a.setCurrentDirection(Ant.RIGHT);
+			return true;
+		}
+
+		if (nested(a.getXPos()-1, a.getYPos())) {
+			a.setCurrentDirection(Ant.LEFT);
+			return true;
+		}
+		if (nested(a.getXPos(), a.getYPos()+1)) {
+			a.setCurrentDirection(Ant.DOWN);
+			return true;
+		}
+		if (nested(a.getXPos(), a.getYPos()-1)) {
+			a.setCurrentDirection(Ant.UP);
+			return true;
+		}
+		return false;
+	}
+
+	private boolean nearFood(Ant a) {
+		if (checkFood(a.getXPos()+1, a.getYPos())) {
+			a.setCurrentDirection(Ant.RIGHT);
+			return true;
+		}
+		if (checkFood(a.getXPos()-1, a.getYPos())) {
+			a.setCurrentDirection(Ant.LEFT);
+			return true;
+		}
+		if (checkFood(a.getXPos() , a.getYPos()+1)) {
+			a.setCurrentDirection(Ant.DOWN);
+			return true;
+		}
+
+		if (checkFood(a.getXPos() , a.getYPos()-1)) {
+			a.setCurrentDirection(Ant.UP);
+			return true;
+		}
+
+		return false;
+	}
+
+	private boolean checkFood(int dx, int dy) {
+		boolean checkFood = false;
+		if (world.getAvailableCell(dx, dy) != null)
+			checkFood = (world.getCell(dx, dy).getFood() > 0);
+		return checkFood;
 	}
 
 	private int chooseFoundDirection(Ant a, ArrayList<Integer> erasedDirection) {
@@ -269,7 +338,7 @@ public class Manager {
 
 	private int getFoundPh(int dx, int dy) {
 		int ph = 0;
-		if (world.getCell(dx, dy) != null)
+		if (world.getAvailableCell(dx, dy) != null)
 			ph = (int) world.getCell(dx, dy).getGroundState().getFoundPhLevel();
 
 		return ph;
@@ -323,7 +392,7 @@ public class Manager {
 				whereGo.getGroundState().increaseFoundPh(a);
 				diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
-				if (nested(a)) {
+				if (nested(a.getXPos(), a.getYPos())) {
 					a.setMaxPheromones();
 					a.setStep_Ant(0);
 					a.setAntState(Ant.SEARCH);
@@ -343,11 +412,10 @@ public class Manager {
 
 	}
 
-	private boolean nested(Ant a) {
+	private boolean nested(int x, int y) {
 		Point nest = world.getNest();
-		if (nest.x + World.NEST_WIDTH > a.getXPos() && nest.x < a.getXPos()
-				&& nest.y < a.getYPos()
-				&& nest.y + World.NEST_HEIGHT > a.getYPos())
+		if (nest.x + World.NEST_WIDTH > x && nest.x < x && nest.y < y
+				&& nest.y + World.NEST_HEIGHT > y)
 			return true;
 		return false;
 	}
