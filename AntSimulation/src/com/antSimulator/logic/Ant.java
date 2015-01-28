@@ -3,7 +3,6 @@ package com.antSimulator.logic;
 import java.awt.Point;
 import java.util.Random;
 
-
 public class Ant {
 
 	public static final int UP = 0;
@@ -16,8 +15,8 @@ public class Ant {
 	public static final int PHDESEASE = 10;
 	public static final int MAXPHEROMONE = 500;
 
-	//public static final String RESEARCHPHEROMONE = "researchPheromone";
-	//public static final String FOUNDPHEROMONE = "foundPheromone";
+	// public static final String RESEARCHPHEROMONE = "researchPheromone";
+	// public static final String FOUNDPHEROMONE = "foundPheromone";
 	public static final int MAXSTEPSAMEDIR = 60;
 
 	private int direction;
@@ -27,7 +26,7 @@ public class Ant {
 	private String name;
 	private int step_Ant = 0;
 	private Random r;
-	private int maxPheromones=MAXPHEROMONE;
+	private int maxPheromones = MAXPHEROMONE;
 	private int currentDirection = new Random().nextInt(4);
 	private int currentPH;
 
@@ -43,15 +42,16 @@ public class Ant {
 	}
 
 	private void inizializePheromone() {
-		currentPH=maxPheromones;
+		currentPH = maxPheromones;
 	}
 
-	public void setMaxPheromones(){
-		if(currentPH>0)
-			maxPheromones-=currentPH;
+	public void setMaxPheromones() {
+		if (currentPH > 0)
+			maxPheromones -= currentPH;
 		else
-			maxPheromones+=MAXPHEROMONE;
+			maxPheromones = MAXPHEROMONE;
 	}
+
 	private Point setPosition(Point pos) {
 		int x = new Random().nextInt(World.NEST_WIDTH);
 		int y = new Random().nextInt(World.NEST_HEIGHT);
@@ -60,7 +60,7 @@ public class Ant {
 	}
 
 	public Ant(Ant ant) {
-        this.currentPH=ant.getCurrentPH();
+		this.currentPH = ant.getCurrentPH();
 		this.direction = ant.direction;
 		this.antState = ant.antState;
 		this.setLevel(ant.getLevel());
@@ -68,12 +68,15 @@ public class Ant {
 		this.name = ant.name;
 	}
 
-	public void releasePheromones(){
-		currentPH-=PHDESEASE;
+	public void releasePheromones() {
+		if (currentPH > 0)
+			currentPH -= PHDESEASE;
+		else
+			currentPH = 0;
 	}
 
 	public void restartPhRelease() {
-		currentPH=MAXPHEROMONE;
+		currentPH = MAXPHEROMONE;
 	}
 
 	public void nextStep() {

@@ -377,7 +377,7 @@ public class Manager {
 
 			if (a.getAntState() == Ant.SEARCH) {
 				whereGo.getGroundState().increaseSearchPh(a);
-				diffusePheromones(current.getGroundState(), a);
+				//diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
 
 				if (whereGo.getFood() > 0) {
@@ -390,7 +390,7 @@ public class Manager {
 				}
 			} else if (a.getAntState() == Ant.FOUND) {
 				whereGo.getGroundState().increaseFoundPh(a);
-				diffusePheromones(current.getGroundState(), a);
+				//diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
 				if (nested(a.getXPos(), a.getYPos())) {
 					a.setMaxPheromones();

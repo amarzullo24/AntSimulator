@@ -1,7 +1,5 @@
 package com.antSimulator.gui;
 
-import java.awt.Point;
-
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
