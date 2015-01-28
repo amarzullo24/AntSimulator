@@ -21,7 +21,7 @@ import com.antSimulator.logic.World;
 
 public class AntPanel extends Application {
 
-	public static final int CELLSIZE = 10;
+	public static final int CELLSIZE = 4;
 	public static final int PANEL_SIZE_X = World.WIDTH * CELLSIZE;
 	public static final int PANEL_SIZE_Y = World.HEIGHT * CELLSIZE;
 

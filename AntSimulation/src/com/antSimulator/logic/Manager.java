@@ -12,7 +12,7 @@ public class Manager {
 	public static int PHREDUCTION = 20;
 	public static int UPDATE_TIME = 250;
 
-	public static final int CORE_NUMBER = 7;
+	public static final int CORE_NUMBER = 2;
 	public static boolean ISACTIVE = true;
 	public static final int SLEEP_TIME = 50;
 
