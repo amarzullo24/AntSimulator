@@ -9,8 +9,8 @@ public class World {
 
 	public static int NUM_OF_ANTS = 10;
 	public static final short MAX_NUM_OF_ANT = 100;
-	public static final int WIDTH = 100;
-	public static final int HEIGHT = 100;
+	public static final int WIDTH = 70;
+	public static final int HEIGHT = 70;
 	public static final int FOOD_WIDTH = 5;
 	public static final int FOOD_HEIGHT = 5;
 	public static final int NEST_WIDTH = 6;

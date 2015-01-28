@@ -4,8 +4,8 @@ import java.util.HashMap;
 
 public class Cell {
 
-	public static final int MaxFood = 100;
-	public static final int AntCapacity = 10;
+	public static final int MAX_FOOD = 100;
+	public static final int ANT_CAPACITY = 10;
 
 	private HashMap<String, Ant> antsSet;
 	private GroundState groundState;
@@ -55,7 +55,7 @@ public class Cell {
 	}
 
 	public void insertFood() {
-		food = MaxFood;
+		food = MAX_FOOD;
 	}
 
 	public void removeFood() {
@@ -64,7 +64,7 @@ public class Cell {
 
 	public void decreaseFood() {
 		if (food > 0)
-			food -= AntCapacity;
+			food -= ANT_CAPACITY;
 		else {
 			food = 0;
 		}

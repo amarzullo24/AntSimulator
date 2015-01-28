@@ -7,6 +7,7 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+
 public class Manager {
 
 	public static int PHREDUCTION = 20;
@@ -24,6 +25,9 @@ public class Manager {
 	private static Manager instance;
 	private ArrayList<Worker> workers = new ArrayList<Worker>();
 
+	public static short TOTAL_FOOD = World.FOOD_WIDTH*World.FOOD_HEIGHT*Cell.MAX_FOOD;
+	public static short NESTED_FOOD = 0;
+	
 	public static Manager getInstance() {
 
 		if (instance == null)
@@ -385,6 +389,7 @@ public class Manager {
 					a.setStep_Ant(0);
 					a.setAntState(Ant.FOUND);
 					whereGo.decreaseFood();
+					TOTAL_FOOD-=Cell.ANT_CAPACITY;
 					a.setCurrentDirection(backDirection(a));
 					a.restartPhRelease();
 				}
@@ -398,7 +403,8 @@ public class Manager {
 					a.setAntState(Ant.SEARCH);
 					a.setCurrentDirection(backDirection(a));
 					a.restartPhRelease();
-
+					NESTED_FOOD+=Cell.ANT_CAPACITY;
+					Observer.getIstance().update(NESTED_FOOD);
 				}
 
 			}

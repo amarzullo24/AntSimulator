@@ -1,28 +1,34 @@
 package com.antSimulator.gui;
 
-import java.awt.Button;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+
+import java.util.Arrays;
 
 import com.antSimulator.logic.Manager;
+import com.antSimulator.logic.Observed;
+import com.antSimulator.logic.Observer;
 import com.antSimulator.logic.World;
 
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
-import javafx.collections.MapChangeListener;
+import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
+import javafx.scene.chart.CategoryAxis;
+import javafx.scene.chart.NumberAxis;
+import javafx.scene.chart.StackedBarChart;
+import javafx.scene.chart.XYChart;
+import javafx.scene.chart.XYChart.Data;
+import javafx.scene.chart.XYChart.Series;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
 import javafx.scene.control.SliderBuilder;
-import javafx.scene.control.ToggleButton;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.control.Tooltip;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.scene.layout.VBoxBuilder;
 
-public class RightPanel {
+public class RightPanel implements Observed{
 
 	private static final String RIGHTLAYOUT = "rightLayout";
 	public final static String LABELRIGHT = "labelRight";
@@ -35,9 +41,20 @@ public class RightPanel {
 	private Label antValue;
 	private Label stepValue;
 
-	private VBox sliderbox;
+	private VBox slider_box;
+	private VBox statistics_box;
+	
+	//TODO
+	/*
+	 * TEMPO MEDIO DI ANDATA E RITORNO
+	 * MEDIA CIBO PORTATO A DESTINAZIONE
+	 * 
+	 */
 
+    public static StackedBarChart<String,Number> stackedBarChart;
+	
 	public RightPanel() {
+		
 		box = VBoxBuilder.create().id(RIGHTLAYOUT).build();
 		box.setSpacing(10);
 		box.setPrefSize(400, 400);
@@ -45,8 +62,12 @@ public class RightPanel {
 		HBox antbox = new HBox();
 		HBox stepbox = new HBox();
 		HBox buttonbox = new HBox();
-		sliderbox = new VBox();
-
+		slider_box = new VBox();
+		statistics_box = new VBox();
+		
+		box.getChildren().add(statistics_box);
+		initChart();
+		
 		buttonbox.setAlignment(Pos.CENTER);
 		ToggleGroup group = new ToggleGroup();
 		RadioButton addFoodButton = new RadioButton("Add Food");
@@ -88,7 +109,7 @@ public class RightPanel {
 			}
 		});
 		modifyButton.setSelected(true);
-		sliderbox.setSpacing(10);
+		slider_box.setSpacing(10);
 		antbox.setSpacing(10);
 		stepbox.setSpacing(10);
 		buttonbox.setSpacing(10);
@@ -99,8 +120,36 @@ public class RightPanel {
 		buildSlideBar("UPDATE_TIME", 10, 300, Manager.UPDATE_TIME);
 		buildSlideBar("NUM_OF_ANTS", 1, World.MAX_NUM_OF_ANT, 10);
 
-		box.getChildren().addAll(antbox, stepbox, sliderbox, buttonbox);
+		box.getChildren().addAll(antbox, stepbox, slider_box, buttonbox);
 
+	}
+
+	static short STEP = 1;
+	private void initChart() {
+		
+		final CategoryAxis xAxis = new CategoryAxis();
+        final NumberAxis yAxis = new NumberAxis();
+
+        xAxis.setCategories(FXCollections.<String> observableArrayList(Arrays.asList("nested","total" )));
+           
+        stackedBarChart = new StackedBarChart<>(xAxis,yAxis);
+   
+        stackedBarChart.setTitle("Nested Food");
+          
+        //Series 1
+        XYChart.Series<String,Number> series1 = new Series<String, Number>();
+        series1.getData().add(new Data<String, Number>("nested", Manager.NESTED_FOOD));
+        
+        XYChart.Series<String,Number> series2 = new Series<String, Number>();
+        series2.getData().add(new Data<String, Number>("total", Manager.TOTAL_FOOD));
+        
+        stackedBarChart.getData().add(series1);
+        stackedBarChart.getData().add(series2);
+        
+        stackedBarChart.setAnimated(true);
+        
+        statistics_box.getChildren().add(stackedBarChart);
+		
 	}
 
 	private void buildSlideBar(final String toSet, int maxValue, int minValue,
@@ -113,7 +162,7 @@ public class RightPanel {
 		s.setValue(defaultValue);
 		s.setTooltip(new Tooltip(toSet));
 
-		sliderbox.setAlignment(Pos.CENTER_LEFT);
+		slider_box.setAlignment(Pos.CENTER_LEFT);
 
 		s.valueProperty().addListener(new ChangeListener<Number>() {
 
@@ -147,7 +196,7 @@ public class RightPanel {
 			}
 		});
 
-		sliderbox.getChildren().addAll(s);
+		slider_box.getChildren().addAll(s);
 	}
 
 	public void updateData(String ant, String step) {
@@ -161,6 +210,13 @@ public class RightPanel {
 
 	public void setBox(VBox box) {
 		this.box = box;
+	}
+
+	@Override
+	public void update() {
+		System.out.println("lasdf");
+		stackedBarChart.getData().get(0).getData().set(0, new Data<String, Number>("nested", Manager.NESTED_FOOD));
+		
 	}
 
 }

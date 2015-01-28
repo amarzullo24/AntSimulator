@@ -17,6 +17,7 @@ import javafx.stage.WindowEvent;
 import com.antSimulator.logic.Cell;
 import com.antSimulator.logic.GroundState;
 import com.antSimulator.logic.Manager;
+import com.antSimulator.logic.Observer;
 import com.antSimulator.logic.World;
 
 public class AntPanel extends Application {
@@ -65,7 +66,9 @@ public class AntPanel extends Application {
 
 		HBox hbox = new HBox();
 		hbox.getChildren().add(canvas);
-		hbox.getChildren().add(new RightPanel().getBox());
+		RightPanel rp = new RightPanel(); 
+		Observer.getIstance().register(rp);
+		hbox.getChildren().add(rp.getBox());
 		root.getChildren().add(hbox);
 
 		stage.setScene(new Scene(root));
@@ -205,7 +208,7 @@ public class AntPanel extends Application {
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
 
-				gc.setGlobalAlpha(cell.getFood() / Cell.MaxFood);
+				gc.setGlobalAlpha(cell.getFood() / Cell.MAX_FOOD);
 				gc.setFill(Color.GREEN);
 				gc.fillRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE, CELLSIZE);
 
@@ -217,6 +220,7 @@ public class AntPanel extends Application {
 
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
+				
 
 			}// for
 
@@ -226,6 +230,7 @@ public class AntPanel extends Application {
 		gc.fillRoundRect(world.getNest().getX() * CELLSIZE, world.getNest()
 				.getY() * CELLSIZE, CELLSIZE * World.NEST_WIDTH, CELLSIZE
 				* World.NEST_HEIGHT, 10, 10);
+		
 		Manager.getInstance().lock.unlock();
 	}// repaint
 
