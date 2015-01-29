@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 public class Cell {
 
-	public static final int MAX_FOOD = 100;
+	public static final int MAX_FOOD = 10;
 	public static final int ANT_CAPACITY = 10;
 
 	private HashMap<String, Ant> antsSet;

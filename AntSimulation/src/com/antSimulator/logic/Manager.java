@@ -7,13 +7,15 @@ import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
+import com.antSimulator.gui.RightPanel;
+
 
 public class Manager {
 
-	public static int PHREDUCTION = 20;
+	public static int PHREDUCTION = 10;
 	public static int UPDATE_TIME = 250;
 
-	public static final int CORE_NUMBER = 2;
+	public static final int CORE_NUMBER = 3;
 	public static boolean ISACTIVE = true;
 	public static final int SLEEP_TIME = 50;
 
@@ -24,6 +26,9 @@ public class Manager {
 	public Condition condition = lock.newCondition();
 	private static Manager instance;
 	private ArrayList<Worker> workers = new ArrayList<Worker>();
+	
+	public static short TOTAL_TIME = 0;
+	public static short TOTAL_ANTS_TO_NEST = 0;
 
 	public static short TOTAL_FOOD = World.FOOD_WIDTH*World.FOOD_HEIGHT*Cell.MAX_FOOD;
 	public static short NESTED_FOOD = 0;
@@ -372,6 +377,7 @@ public class Manager {
 
 	private void transaction(Ant a, Cell whereGo) {
 
+		a.stepOfRoundtrip++;
 		Cell current = world.getCell((int) a.getXPos(), (int) a.getYPos());
 
 		if (a.getLevel() == whereGo.getGroundState().getLevel()) {
@@ -389,9 +395,9 @@ public class Manager {
 					a.setStep_Ant(0);
 					a.setAntState(Ant.FOUND);
 					whereGo.decreaseFood();
-					TOTAL_FOOD-=Cell.ANT_CAPACITY;
 					a.setCurrentDirection(backDirection(a));
 					a.restartPhRelease();
+					TOTAL_FOOD-=Cell.ANT_CAPACITY;
 				}
 			} else if (a.getAntState() == Ant.FOUND) {
 				whereGo.getGroundState().increaseFoundPh(a);
@@ -404,7 +410,10 @@ public class Manager {
 					a.setCurrentDirection(backDirection(a));
 					a.restartPhRelease();
 					NESTED_FOOD+=Cell.ANT_CAPACITY;
-					Observer.getIstance().update(NESTED_FOOD);
+					TOTAL_TIME += a.stepOfRoundtrip;
+					TOTAL_ANTS_TO_NEST++;
+					a.stepOfRoundtrip = 0;
+					Observer.getIstance().update();
 				}
 
 			}

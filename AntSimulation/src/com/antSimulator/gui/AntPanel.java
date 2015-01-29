@@ -8,6 +8,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.chart.XYChart.Data;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -22,7 +23,7 @@ import com.antSimulator.logic.World;
 
 public class AntPanel extends Application {
 
-	public static final int CELLSIZE = 4;
+	public static final int CELLSIZE = 5;
 	public static final int PANEL_SIZE_X = World.WIDTH * CELLSIZE;
 	public static final int PANEL_SIZE_Y = World.HEIGHT * CELLSIZE;
 
@@ -37,6 +38,7 @@ public class AntPanel extends Application {
 	private GraphicsContext gc;
 	public static String currentButtonSelection;
 
+	
 	public AntPanel() {
 		world = Manager.getInstance().world;
 		currentButtonSelection = MODIFYLEVEL;
@@ -163,6 +165,10 @@ public class AntPanel extends Application {
 			public void handle(long arg0) {
 
 				repaint();
+				RightPanel.data[0].setYValue(Manager.NESTED_FOOD);
+				RightPanel.data[1].setYValue(Manager.TOTAL_FOOD);
+				//da aggiungere un altro grafico o una label semplice
+				int media = Manager.TOTAL_TIME/Manager.TOTAL_ANTS_TO_NEST;
 				sleepQuietly(Manager.SLEEP_TIME);
 
 			}

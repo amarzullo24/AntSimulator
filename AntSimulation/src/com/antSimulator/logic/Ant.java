@@ -29,6 +29,8 @@ public class Ant {
 	private int maxPheromones = MAXPHEROMONE;
 	private int currentDirection = new Random().nextInt(4);
 	private int currentPH;
+	
+	public short stepOfRoundtrip = 0;
 
 	public Ant(int nestLevel, Point pos, int num) {
 		r = new Random();

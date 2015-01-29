@@ -23,7 +23,7 @@ public class Observer {
 		observed.add(o);
 	}
 
-	public void update(short message){
+	public void update(){
 
 		for (Observed ob : observed) {
 				ob.update();

@@ -12,6 +12,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.geometry.Pos;
+import javafx.scene.chart.BarChart;
 import javafx.scene.chart.CategoryAxis;
 import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.StackedBarChart;
@@ -51,7 +52,8 @@ public class RightPanel implements Observed{
 	 * 
 	 */
 
-    public static StackedBarChart<String,Number> stackedBarChart;
+    public static BarChart<String,Number> stackedBarChart;
+    public static XYChart.Data<String,Number>[] data;
 	
 	public RightPanel() {
 		
@@ -124,7 +126,7 @@ public class RightPanel implements Observed{
 
 	}
 
-	static short STEP = 1;
+
 	private void initChart() {
 		
 		final CategoryAxis xAxis = new CategoryAxis();
@@ -132,16 +134,23 @@ public class RightPanel implements Observed{
 
         xAxis.setCategories(FXCollections.<String> observableArrayList(Arrays.asList("nested","total" )));
            
-        stackedBarChart = new StackedBarChart<>(xAxis,yAxis);
+        stackedBarChart = new BarChart<>(xAxis,yAxis);
    
         stackedBarChart.setTitle("Nested Food");
           
         //Series 1
-        XYChart.Series<String,Number> series1 = new Series<String, Number>();
-        series1.getData().add(new Data<String, Number>("nested", Manager.NESTED_FOOD));
+        XYChart.Series<String,Number> series1 = new XYChart.Series<String, Number>();
+        XYChart.Series<String,Number> series2 = new XYChart.Series<String, Number>();
+
+        data = new XYChart.Data[2];
         
-        XYChart.Series<String,Number> series2 = new Series<String, Number>();
-        series2.getData().add(new Data<String, Number>("total", Manager.TOTAL_FOOD));
+        
+        data[0] = new BarChart.Data<String, Number>("nested", Manager.NESTED_FOOD);
+        data[1] = new BarChart.Data("total", Manager.TOTAL_FOOD);
+        
+         
+        series1.getData().add(data[0]);
+        series2.getData().add(data[1]);
         
         stackedBarChart.getData().add(series1);
         stackedBarChart.getData().add(series2);
@@ -214,9 +223,11 @@ public class RightPanel implements Observed{
 
 	@Override
 	public void update() {
-		System.out.println("lasdf");
-		stackedBarChart.getData().get(0).getData().set(0, new Data<String, Number>("nested", Manager.NESTED_FOOD));
 		
+		int media = 1;
+		int totalAnts = Manager.getInstance().world.getAnts().size();
+		
+	
 	}
 
 }
