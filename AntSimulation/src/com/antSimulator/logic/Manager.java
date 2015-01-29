@@ -28,7 +28,7 @@ public class Manager {
 	private ArrayList<Worker> workers = new ArrayList<Worker>();
 	
 	public static short TOTAL_TIME = 0;
-	public static short TOTAL_ANTS_TO_NEST = 0;
+	public static short TOTAL_ANTS_TO_NEST = 1;
 
 	public static short TOTAL_FOOD = World.FOOD_WIDTH*World.FOOD_HEIGHT*Cell.MAX_FOOD;
 	public static short NESTED_FOOD = 0;
