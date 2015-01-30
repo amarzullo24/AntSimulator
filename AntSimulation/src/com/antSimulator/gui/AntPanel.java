@@ -195,7 +195,7 @@ public class AntPanel extends Application {
 		for (int i = 0; i < World.WIDTH; i++) {
 			for (int j = 0; j < World.HEIGHT; j++) {
 
-				Cell cell = world.getCell(i, j);
+				Cell cell = world.getCellToDraw(i, j);
 				GroundState g = cell.getGroundState();
 
 				gc.setGlobalAlpha((double) g.getLevel()
@@ -218,7 +218,7 @@ public class AntPanel extends Application {
 				gc.setFill(Color.GREEN);
 				gc.fillRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE, CELLSIZE);
 
-				if (cell.getAntsSet().size() > 0) {
+				if (cell.getNumberOfAnts() > 0) {
 
 					gc.setGlobalAlpha(1.0);
 					gc.setFill(Color.RED);
@@ -233,8 +233,8 @@ public class AntPanel extends Application {
 		}// for
 		gc.setGlobalAlpha(1.0);
 		gc.setFill(Color.BROWN);
-		gc.fillRoundRect(world.getNest().getX() * CELLSIZE, world.getNest()
-				.getY() * CELLSIZE, CELLSIZE * World.NEST_WIDTH, CELLSIZE
+		gc.fillRoundRect(world.getNest().getxPos() * CELLSIZE, world.getNest()
+				.getyPos() * CELLSIZE, CELLSIZE * World.NEST_WIDTH, CELLSIZE
 				* World.NEST_HEIGHT, 10, 10);
 		
 		Manager.getInstance().lock.unlock();

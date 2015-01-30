@@ -18,10 +18,9 @@ public class World {
 	public static final short MAX_PH_LEVEL = 1000;
 
 	private Cell[][] matrix;
-	private boolean[][] lockedCell;
-	private BlockingQueue<Ant> ants;
-	private Point nest;
-	private int nestlevel;
+	private Cell[][] updatingMatrix;
+	private boolean updated;
+	private Nest nest;
 
 	// private ArrayList<Point> food;
 
@@ -33,17 +32,9 @@ public class World {
 	}
 
 	private void spawnAnts() {
-		ants = new ArrayBlockingQueue<Ant>(MAX_NUM_OF_ANT + 1);
 
 		for (int i = 0; i < NUM_OF_ANTS; i++)
-			try {
-
-				Ant a = new Ant(nestlevel, (Point) nest.clone(), i + 1);
-				ants.put(a);
-
-			} catch (InterruptedException e) {
-				e.printStackTrace();
-			}
+			nest.addAnt(i);
 
 	}
 
@@ -51,22 +42,17 @@ public class World {
 
 		Manager.getInstance().lock.lock();
 
-		if (ants.size() < NUM_OF_ANTS) {
-			for (int i = ants.size(); i < NUM_OF_ANTS; i++)
-				try {
+		if (nest.getAnts().size() < NUM_OF_ANTS) {
+			for (int i = nest.getAnts().size(); i < NUM_OF_ANTS; i++)
+				nest.addAnt(i);
 
-					Ant a = new Ant(nestlevel, (Point) nest.clone(), i + 1);
-					ants.put(a);
-
-				} catch (InterruptedException e) {
-					e.printStackTrace();
-				}
 		} else {
 
-			while (ants.size() != NUM_OF_ANTS) {
+			while (nest.getAnts().size() != NUM_OF_ANTS) {
 
-				Ant a = ants.remove();
-				this.matrix[a.getXPos()][a.getYPos()].removeAntfromArray(a);
+				Ant a = nest.removeLastAnt();
+				this.matrix[a.getXPos()][a.getYPos()].removeAntfromArray();
+				;
 			}
 
 		}
@@ -78,23 +64,24 @@ public class World {
 	private void loadWorld() {
 
 		matrix = new Cell[WIDTH][HEIGHT];
-		lockedCell = new boolean[WIDTH][HEIGHT];
+		updatingMatrix = new Cell[WIDTH][HEIGHT];
+		updated = false;
 		initWorld();
 
-		nest = new Point(10, 15);
+		nest = new Nest(10, 15, matrix[10][15].getGroundState());
 		initFood();
 		// food = new ArrayList<Point>();
 		// food.add(new Point(45, 20));
 		// food.add(new Point(10, 40));
 
-		nestlevel = getWorld()[nest.x][nest.y].getGroundState().getLevel();
-
 	}
 
 	private void initFood() {
 		for (int i = 0; i < FOOD_WIDTH; i++)
-			for (int j = 0; j < FOOD_HEIGHT; j++)
-				matrix[45+i][20+j].insertFood();
+			for (int j = 0; j < FOOD_HEIGHT; j++){
+				matrix[45 + i][20 + j].insertFood();
+				updatingMatrix[45+i][20+j].insertFood();
+			}
 
 	}
 
@@ -117,7 +104,7 @@ public class World {
 				// }
 
 				matrix[i][j] = new Cell(i, j, newVal);
-				lockedCell[i][j] = false;
+				updatingMatrix[i][j] = new Cell(i, j, newVal);
 			}
 		}
 
@@ -126,6 +113,7 @@ public class World {
 			int i = new Random().nextInt(HEIGHT);
 			int j = new Random().nextInt(WIDTH);
 			matrix[i][j].getGroundState().setLevel(GroundState.MAXLEVEL);
+			updatingMatrix[i][j].getGroundState().setLevel(GroundState.MAXLEVEL);
 		}
 
 	}
@@ -145,83 +133,85 @@ public class World {
 		else if (matrix[xPos][yPos].getGroundState().getLevel() == GroundState.MAXLEVEL)
 			return null;
 
-		else
-			return matrix[xPos][yPos];
+		else {
+			if (!updated)
+				return matrix[xPos][yPos];
+			else
+				return updatingMatrix[xPos][yPos];
+		}
 	}
 
+	public Cell getCellToDraw(int xPos,int yPos){
+		if (xPos < 0 || xPos >= WIDTH || yPos < 0 || yPos >= HEIGHT)
+			return null;
+
+		else {
+			if (updated)
+				return matrix[xPos][yPos];
+			else
+				return updatingMatrix[xPos][yPos];
+		}
+	}
 	public Cell getCell(int xPos, int yPos) {
 
 		if (xPos < 0 || xPos >= WIDTH || yPos < 0 || yPos >= HEIGHT)
 			return null;
-		else
-			return matrix[xPos][yPos];
-	}
-
-	public boolean[][] getLockedCell() {
-		return lockedCell;
-	}
-
-	public void setLockedCell(boolean[][] lockedCell) {
-		this.lockedCell = lockedCell;
-	}
-
-	public void unlockCell(int x, int y, int nx, int ny) {
-		Manager.getInstance().lock.lock();
-		try {
-
-			lockedCell[x][y] = false;
-			lockedCell[nx][ny] = false;
-
-			Manager.getInstance().condition.signalAll();
-
-		} finally {
-			Manager.getInstance().lock.unlock();
+		else {
+			if (!updated)
+				return matrix[xPos][yPos];
+			else
+				return updatingMatrix[xPos][yPos];
 		}
 	}
 
-	public void lockCell(int x, int y, int nx, int ny) {
-
-		Manager.getInstance().lock.lock();
-		try {
-
-			while (lockedCell[x][y] || lockedCell[nx][ny])
-				try {
-
-					Manager.getInstance().condition.signalAll();
-					Manager.getInstance().condition.await();
-
-				} catch (InterruptedException e) {
-
-					e.printStackTrace();
-				}
-
-			lockedCell[x][y] = true;
-			lockedCell[nx][ny] = true;
-
-		} finally {
-			Manager.getInstance().lock.unlock();
-		}
-
-	}
-
-	public BlockingQueue<Ant> getAnts() {
-		return ants;
-	}
-
-	public void setAnts(BlockingQueue<Ant> ants) {
-		this.ants = ants;
-	}
+	/*
+	 * public void unlockCell(int x, int y, int nx, int ny) {
+	 * Manager.getInstance().lock.lock(); try {
+	 * 
+	 * lockedCell[x][y] = false; lockedCell[nx][ny] = false;
+	 * 
+	 * Manager.getInstance().condition.signalAll();
+	 * 
+	 * } finally { Manager.getInstance().lock.unlock(); } }
+	 * 
+	 * public void lockCell(int x, int y, int nx, int ny) {
+	 * 
+	 * Manager.getInstance().lock.lock(); try {
+	 * 
+	 * while (lockedCell[x][y] || lockedCell[nx][ny]) try {
+	 * 
+	 * Manager.getInstance().condition.signalAll();
+	 * Manager.getInstance().condition.await();
+	 * 
+	 * } catch (InterruptedException e) {
+	 * 
+	 * e.printStackTrace(); }
+	 * 
+	 * lockedCell[x][y] = true; lockedCell[nx][ny] = true;
+	 * 
+	 * } finally { Manager.getInstance().lock.unlock(); }
+	 * 
+	 * }
+	 */
 
 	public void setCell(Cell cell) {
 		this.matrix[cell.getX()][cell.getY()] = cell;
 	}
 
-	public Point getNest() {
+	public Nest getNest() {
 		return nest;
 	}
 
-	public void setNest(Point nest) {
+	public void setNest(Nest nest) {
 		this.nest = nest;
+	}
+
+	public boolean isUpdated() {
+		return updated;
+	}
+
+	public void setUpdated(boolean updated) {
+		this.updated = updated;
 	}
 
 }

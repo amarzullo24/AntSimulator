@@ -9,7 +9,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 import com.antSimulator.gui.RightPanel;
 
-
 public class Manager {
 
 	public static int PHREDUCTION = 10;
@@ -25,14 +24,14 @@ public class Manager {
 	public Lock lock = new ReentrantLock();
 	public Condition condition = lock.newCondition();
 	private static Manager instance;
-	private ArrayList<Worker> workers = new ArrayList<Worker>();
-	
+
 	public static short TOTAL_TIME = 0;
 	public static short TOTAL_ANTS_TO_NEST = 1;
 
-	public static short TOTAL_FOOD = World.FOOD_WIDTH*World.FOOD_HEIGHT*Cell.MAX_FOOD;
+	public static short TOTAL_FOOD = World.FOOD_WIDTH * World.FOOD_HEIGHT
+			* Cell.MAX_FOOD;
 	public static short NESTED_FOOD = 0;
-	
+
 	public static Manager getInstance() {
 
 		if (instance == null)
@@ -44,10 +43,6 @@ public class Manager {
 	public void start() {
 		updating = false;
 		world = loadWorld();
-		for (int i = 0; i < CORE_NUMBER; i++) {
-			workers.add(new Worker(world.getAnts()));
-			workers.get(i).start();
-		}
 		new UpdateThread().start();
 	}
 
@@ -55,22 +50,6 @@ public class Manager {
 		return new World();
 
 	}
-
-	/*
-	 * public void moveAnt(Ant a){ ArrayList<Integer> erasedDirection = new
-	 * ArrayList<Integer>(); erasedDirection.add(backDirection(a));
-	 * a.nextStep();
-	 * 
-	 * if (a.getStep_Ant() == Ant.MAXSTEPSAMEDIR) { a.setStep_Ant(0);
-	 * erasedDirection.add(a.getCurrentDirection()); }
-	 * 
-	 * boolean check=false; Cell currentChoise=null; while(!check &&
-	 * !(erasedDirection.size()==4)){ if(a.getAntState()== Ant.SEARCH)
-	 * currentChoise=chooseSearchDirection(a,erasedDirection); else
-	 * if(a.getAntState()==Ant.FOUND) currentChoise=chooseFoundDirection(a,
-	 * erasedDirection); check=choose(currentChoise, a); if(!check)
-	 * erasedDirection.add(a.getCurrentDirection()); } }
-	 */
 
 	public void moveAnts(Ant a) {
 		ArrayList<Integer> erasedDirection = new ArrayList<Integer>();
@@ -129,20 +108,20 @@ public class Manager {
 
 	private boolean nearNest(Ant a) {
 
-		if (nested(a.getXPos()+1, a.getYPos())) {
+		if (nested(a.getXPos() + 1, a.getYPos())) {
 			a.setCurrentDirection(Ant.RIGHT);
 			return true;
 		}
 
-		if (nested(a.getXPos()-1, a.getYPos())) {
+		if (nested(a.getXPos() - 1, a.getYPos())) {
 			a.setCurrentDirection(Ant.LEFT);
 			return true;
 		}
-		if (nested(a.getXPos(), a.getYPos()+1)) {
+		if (nested(a.getXPos(), a.getYPos() + 1)) {
 			a.setCurrentDirection(Ant.DOWN);
 			return true;
 		}
-		if (nested(a.getXPos(), a.getYPos()-1)) {
+		if (nested(a.getXPos(), a.getYPos() - 1)) {
 			a.setCurrentDirection(Ant.UP);
 			return true;
 		}
@@ -150,20 +129,20 @@ public class Manager {
 	}
 
 	private boolean nearFood(Ant a) {
-		if (checkFood(a.getXPos()+1, a.getYPos())) {
+		if (checkFood(a.getXPos() + 1, a.getYPos())) {
 			a.setCurrentDirection(Ant.RIGHT);
 			return true;
 		}
-		if (checkFood(a.getXPos()-1, a.getYPos())) {
+		if (checkFood(a.getXPos() - 1, a.getYPos())) {
 			a.setCurrentDirection(Ant.LEFT);
 			return true;
 		}
-		if (checkFood(a.getXPos() , a.getYPos()+1)) {
+		if (checkFood(a.getXPos(), a.getYPos() + 1)) {
 			a.setCurrentDirection(Ant.DOWN);
 			return true;
 		}
 
-		if (checkFood(a.getXPos() , a.getYPos()-1)) {
+		if (checkFood(a.getXPos(), a.getYPos() - 1)) {
 			a.setCurrentDirection(Ant.UP);
 			return true;
 		}
@@ -358,28 +337,21 @@ public class Manager {
 		boolean check = false;
 		if (currentChoise == null)
 			return check;
-		int x = (int) a.getXPos();
-		int y = (int) a.getYPos();
-		int nx = currentChoise.getX();
-		int ny = currentChoise.getY();
-
-		world.lockCell(x, y, nx, ny);
 
 		if (currentChoise != null) {
 			check = true;
 			transaction(a, currentChoise);
 		}
 
-		world.unlockCell(x, y, nx, ny);
-
 		return check;
 	}
 
-	private void transaction(Ant a, Cell whereGo) {
+	private void transaction(Ant a, Cell oldWhereGo) {
 
 		a.stepOfRoundtrip++;
-		Cell current = world.getCell((int) a.getXPos(), (int) a.getYPos());
-
+		Cell current = world.getCellToDraw(a.getXPos(), a.getYPos());
+		Cell whereGo = world
+				.getCellToDraw(oldWhereGo.getX(), oldWhereGo.getY());
 		if (a.getLevel() == whereGo.getGroundState().getLevel()) {
 
 			a.setXPos(whereGo.getX());
@@ -387,7 +359,7 @@ public class Manager {
 
 			if (a.getAntState() == Ant.SEARCH) {
 				whereGo.getGroundState().increaseSearchPh(a);
-				//diffusePheromones(current.getGroundState(), a);
+				// diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
 
 				if (whereGo.getFood() > 0) {
@@ -397,11 +369,11 @@ public class Manager {
 					whereGo.decreaseFood();
 					a.setCurrentDirection(backDirection(a));
 					a.restartPhRelease();
-					TOTAL_FOOD-=Cell.ANT_CAPACITY;
+					TOTAL_FOOD -= Cell.ANT_CAPACITY;
 				}
 			} else if (a.getAntState() == Ant.FOUND) {
 				whereGo.getGroundState().increaseFoundPh(a);
-				//diffusePheromones(current.getGroundState(), a);
+				// diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
 				if (nested(a.getXPos(), a.getYPos())) {
 					a.setMaxPheromones();
@@ -409,7 +381,7 @@ public class Manager {
 					a.setAntState(Ant.SEARCH);
 					a.setCurrentDirection(backDirection(a));
 					a.restartPhRelease();
-					NESTED_FOOD+=Cell.ANT_CAPACITY;
+					NESTED_FOOD += Cell.ANT_CAPACITY;
 					TOTAL_TIME += a.stepOfRoundtrip;
 					TOTAL_ANTS_TO_NEST++;
 					a.stepOfRoundtrip = 0;
@@ -417,8 +389,8 @@ public class Manager {
 				}
 
 			}
-			current.removeAntfromArray(a);
-			whereGo.insertAntInArray(a);
+			current.removeAntfromArray();
+			whereGo.insertAntInArray();
 
 		} else if (a.getLevel() < whereGo.getGroundState().getLevel())
 			a.setLevel(a.getLevel() + 1);
@@ -428,9 +400,9 @@ public class Manager {
 	}
 
 	private boolean nested(int x, int y) {
-		Point nest = world.getNest();
-		if (nest.x + World.NEST_WIDTH > x && nest.x < x && nest.y < y
-				&& nest.y + World.NEST_HEIGHT > y)
+		Nest nest = world.getNest();
+		if (nest.getxPos() + World.NEST_WIDTH > x && nest.getxPos() < x
+				&& nest.getyPos() < y && nest.getyPos() + World.NEST_HEIGHT > y)
 			return true;
 		return false;
 	}
@@ -439,13 +411,24 @@ public class Manager {
 
 		lock.lock();
 		updating = true;
-
 		for (int i = 0; i < World.WIDTH; i++) {
 			for (int j = 0; j < World.HEIGHT; j++) {
-				world.getCell(i, j).decreaseCellPheromones(PHREDUCTION);
+				float currentPhFound = world.getCell(i, j).getGroundState()
+						.getFoundPhLevel();
+				float currentPhSearch = world.getCell(i, j).getGroundState()
+						.getSearchPhLevel();
+				world.getCellToDraw(i, j).resetPheromones(currentPhFound,
+						currentPhSearch);
+				world.getCellToDraw(i, j).setNumberOfAnts(
+						world.getCell(i, j).getNumberOfAnts());
+				world.getCellToDraw(i, j).decreaseCellPheromones(PHREDUCTION);
 			}
 
 		}
+		for (Ant a : world.getNest().getAnts()) {
+			moveAnts(a);
+		}
+		world.setUpdated(!world.isUpdated());
 		updating = false;
 		condition.signalAll();
 		lock.unlock();

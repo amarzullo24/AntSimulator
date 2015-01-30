@@ -2,13 +2,15 @@ package com.antSimulator.logic;
 
 import java.util.HashMap;
 
+import com.sun.javafx.tk.quantum.UploadingPainter;
+
 public class Cell {
 
 	public static final int MAX_FOOD = 10;
 	public static final int ANT_CAPACITY = 10;
 
-	private HashMap<String, Ant> antsSet;
 	private GroundState groundState;
+	private int numberOfAnts;
 	private int food;
 	private int x;
 	private int y;
@@ -17,33 +19,26 @@ public class Cell {
 		this.setX(x);
 		this.setY(y);
 		food = 0;
-		antsSet = new HashMap<String, Ant>();
+		numberOfAnts = 0;
 		groundState = new GroundState(level);
 	}
 
-	public int increaseGroundLevel(){
-		 return groundState.increaseLevel();
+	public int increaseGroundLevel() {
+		return groundState.increaseLevel();
 	}
+
 	public void decreaseCellPheromones(int decrease) {
 		groundState.decreasePh(decrease);
 	}
 
-	public HashMap<String, Ant> getAntsSet() {
-		return antsSet;
+	public void insertAntInArray() {
+
+		numberOfAnts++;
 	}
 
-	public void setA(HashMap<String, Ant> a) {
-		this.antsSet = a;
-	}
-
-	public void insertAntInArray(Ant ant) {
-
-		this.antsSet.put(ant.getName(), ant);
-	}
-
-	public void removeAntfromArray(Ant ant) {
-
-		this.antsSet.remove(ant.getName());
+	public void removeAntfromArray() {
+		if (numberOfAnts > 0)
+			numberOfAnts--;
 	}
 
 	public GroundState getGroundState() {
@@ -93,5 +88,21 @@ public class Cell {
 	public void setFood(int food) {
 		this.food = food;
 	}
+
+	public int getNumberOfAnts() {
+		return numberOfAnts;
+	}
+
+	public void setNumberOfAnts(int numberOfAnts) {
+		this.numberOfAnts = numberOfAnts;
+	}
+
+	public void resetPheromones(float currentPhFound, float currentPhSearch) {
+		groundState.setFoundPhLevel(currentPhFound);
+		groundState.setSearchPhLevel(currentPhSearch);
+		
+	}
+
+	
 
 }

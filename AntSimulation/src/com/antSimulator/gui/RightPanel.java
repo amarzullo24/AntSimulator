@@ -225,7 +225,7 @@ public class RightPanel implements Observed{
 	public void update() {
 		
 		int media = 1;
-		int totalAnts = Manager.getInstance().world.getAnts().size();
+		int totalAnts = Manager.getInstance().world.getNest().getAnts().size();
 		
 	
 	}
