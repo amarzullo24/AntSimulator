@@ -10,6 +10,7 @@ import java.util.concurrent.locks.ReentrantLock;
 public class Manager {
 
 	public static int PHREDUCTION = 10;
+	public static int DEFAULT_PH_REDUCTION = 10;
 	public static int UPDATE_TIME = 100;
 
 	public static final int CORE_NUMBER = 3;
@@ -31,6 +32,7 @@ public class Manager {
 	public static short NESTED_FOOD = 0;
 	
 	public static int GROUND_RADIOUS = 2;
+	public static boolean ITS_RAINING = false;
 
 	public static Manager getInstance() {
 

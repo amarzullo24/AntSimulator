@@ -11,6 +11,8 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.geometry.Pos;
 import javafx.geometry.Side;
 import javafx.scene.chart.BarChart;
@@ -19,6 +21,7 @@ import javafx.scene.chart.NumberAxis;
 import javafx.scene.chart.PieChart;
 import javafx.scene.chart.XYChart;
 import javafx.scene.control.Accordion;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.Slider;
@@ -57,7 +60,7 @@ public class RightPanel implements Observed{
 
 		box = VBoxBuilder.create().id(RIGHTLAYOUT).build();
 		box.setSpacing(10);
-		box.setPrefSize(400, 600);
+		box.setPrefSize(450, 600);
 		box.setAlignment(Pos.CENTER);
 
 		slider_box = new VBox();
@@ -185,7 +188,7 @@ public class RightPanel implements Observed{
 
 	private void initAccordion() {
 
-		Slider phred = buildSlideBar("PHREDUCTION", 1, 100, Manager.PHREDUCTION, Manager.class);
+		Slider phred = buildSlideBar("PHREDUCTION", 1, 100, Manager.DEFAULT_PH_REDUCTION, Manager.class);
 		Slider uptime = buildSlideBar("UPDATE_TIME", 10, 300, Manager.UPDATE_TIME, Manager.class);
 		Slider numants = buildSlideBar("NUM_OF_ANTS", 1, World.MAX_NUM_OF_ANT, 10, World.class);
 		Slider fw = buildSlideBar("FOOD_WIDTH", 1, 5, World.FOOD_WIDTH, World.class);
@@ -199,8 +202,21 @@ public class RightPanel implements Observed{
 		TitledPane t5 = new TitledPane("FOOD HEIGHT", fh);
 		TitledPane t6 = new TitledPane("GROUND RADIOUS", gr);
 		
+		Button bt = new Button("Rain!");
+		bt.setOnAction(new EventHandler<ActionEvent>() {
+		    @Override public void handle(ActionEvent e) {
+		    	Manager.ITS_RAINING = !Manager.ITS_RAINING;
+		    	if(Manager.ITS_RAINING)
+		    		Manager.PHREDUCTION = 100;
+		    	else {
+					Manager.PHREDUCTION = Manager.DEFAULT_PH_REDUCTION;
+				}
+		    }
+		});
+		
+		TitledPane t7 = new TitledPane("EXTERNAL INFLUENCE", bt);
 		Accordion accordion = new Accordion();
-		accordion.getPanes().addAll(t1, t2, t3,t4,t5,t6);
+		accordion.getPanes().addAll(t1, t2, t3,t4,t5,t6,t7);
 		slider_box.getChildren().add(accordion);
 	
 	}
@@ -216,6 +232,8 @@ public class RightPanel implements Observed{
 		RadioButton addFoodButton = new RadioButton("Add Food");
 		RadioButton removeFoodButton = new RadioButton("Remove Food");
 		RadioButton modifyButton = new RadioButton("Modify Ground");
+		RadioButton moveNestButton = new RadioButton("Move Nest");
+		
 		addFoodButton.setToggleGroup(group);
 		addFoodButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
 
@@ -255,13 +273,25 @@ public class RightPanel implements Observed{
 
 		modifyButton.setSelected(true);
 
+		moveNestButton.setToggleGroup(group);
+		moveNestButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0,
+					Boolean arg1, Boolean newVal) {
+				if(newVal)
+					AntPanel.currentButtonSelection=AntPanel.MOVENEST;
+
+			}
+		});
+		
 		slider_box.setSpacing(10);
 		slider_box.setAlignment(Pos.CENTER_LEFT);
 		antbox.setSpacing(10);
 		stepbox.setSpacing(10);
 		buttonbox.setSpacing(10);
 
-		buttonbox.getChildren().addAll(addFoodButton, removeFoodButton,modifyButton);
+		buttonbox.getChildren().addAll(addFoodButton, removeFoodButton,modifyButton,moveNestButton);
 		
 		box.getChildren().addAll(antbox, stepbox, buttonbox);
 

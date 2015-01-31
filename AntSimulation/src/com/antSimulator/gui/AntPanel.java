@@ -29,6 +29,7 @@ public class AntPanel extends Application {
 	public static final String ADDFOOD = "AddFood";
 	public static final String DELETEFOOD = "DeleteFood";
 	public static final String MODIFYLEVEL = "ModifyLevel";
+	public static final String MOVENEST = "MoveNest";
 
 	private World world;
 	private Group root;
@@ -166,6 +167,15 @@ public class AntPanel extends Application {
 									}
 								}
 							break;
+						case MOVENEST:
+							
+							if(currentX >= World.NESTX - 5 && currentX <= World.NESTX + World.NEST_WIDTH && 
+							   currentY >= World.NESTY - 5 && currentY <= World.NESTY + World.NEST_HEIGHT){
+								World.NESTX = currentX;
+								World.NESTY = currentY;
+								Manager.getInstance().world.nest.setxPos(currentX);
+								Manager.getInstance().world.nest.setyPos(currentY);
+							}
 						default:
 							break;
 						}
@@ -207,7 +217,12 @@ public class AntPanel extends Application {
 	private void repaint() {
 
 		gc.clearRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
-		gc.setFill(Color.BLACK);
+		
+		if(Manager.ITS_RAINING){
+			gc.setFill(Color.STEELBLUE);
+			gc.fillRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
+		}
+		
 		gc.strokeRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
 
 		Manager.getInstance().lock.lock();

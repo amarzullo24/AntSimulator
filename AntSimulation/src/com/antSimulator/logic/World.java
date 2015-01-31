@@ -13,13 +13,15 @@ public class World {
 	public static int FOOD_HEIGHT = 1;
 	public static final int NEST_WIDTH = 6;
 	public static final int NEST_HEIGHT = 6;
+	public static int NESTX = 10;
+	public static int NESTY = 15;
 	
 	public static final short MAX_PH_LEVEL = 1000;
 
 	private Cell[][] matrix;
 	private Cell[][] updatingMatrix;
 	private boolean updated;
-	private Nest nest;
+	public Nest nest;
 
 	// private ArrayList<Point> food;
 
@@ -68,7 +70,7 @@ public class World {
 		updated = false;
 		initWorld();
 
-		nest = new Nest(10, 15, matrix[10][15].getGroundState());
+		nest = new Nest(NESTX, NESTY, matrix[10][15].getGroundState());
 		initFood();
 
 	}
