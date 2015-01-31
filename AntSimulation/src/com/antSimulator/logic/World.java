@@ -51,6 +51,8 @@ public class World {
 
 				Ant a = nest.removeLastAnt();
 				this.matrix[a.getXPos()][a.getYPos()].removeAntfromArray();
+				this.updatingMatrix[a.getXPos()][a.getYPos()].removeAntfromArray();
+				
 			}
 
 		}
