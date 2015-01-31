@@ -8,7 +8,6 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
-import javafx.scene.chart.XYChart.Data;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -23,7 +22,7 @@ import com.antSimulator.logic.World;
 
 public class AntPanel extends Application {
 
-	public static final int CELLSIZE = 5;
+	public static final int CELLSIZE = 4;
 	public static final int PANEL_SIZE_X = World.WIDTH * CELLSIZE;
 	public static final int PANEL_SIZE_Y = World.HEIGHT * CELLSIZE;
 
@@ -93,8 +92,8 @@ public class AntPanel extends Application {
 					@Override
 					public void handle(MouseEvent e) {
 
-						short currentX = (short) (e.getX() / CELLSIZE);
-						short currentY = (short) (e.getY() / CELLSIZE);
+						int currentX = (int) (e.getX() / CELLSIZE);
+						int currentY = (int) (e.getY() / CELLSIZE);
 
 						Cell currentCell = world.getCell(currentX, currentY);
 
@@ -103,10 +102,11 @@ public class AntPanel extends Application {
 
 						switch (currentButtonSelection) {
 						case MODIFYLEVEL:
+							@SuppressWarnings("unused")
 							int currentLevel = currentCell.increaseGroundLevel();
 
 							int i = 1;
-							while (i < 5) {
+							while (i < Manager.GROUND_RADIOUS) {
 
 								for (int j = currentX - i; j <= currentX + i; j++) {
 
@@ -142,11 +142,29 @@ public class AntPanel extends Application {
 							}
 							break;
 						case ADDFOOD:
-							currentCell.insertFood();
+							
+							for(int k = currentX; k<= currentX + World.FOOD_WIDTH; k++)
+								for(int j = currentY; j<=currentY + World.FOOD_HEIGHT; j++)
+								{
+									Cell cC = world.getCell(k, j);
+									if(cC != null){
+										Manager.TOTAL_FOOD+=Cell.MAX_FOOD;
+										cC.insertFood();
+									}
+								}
 
 							break;
 						case DELETEFOOD:
-							currentCell.removeFood();
+							
+							for(int k = currentX; k<= currentX + World.FOOD_WIDTH; k++)
+								for(int j = currentY; j<=currentY + World.FOOD_HEIGHT; j++)
+								{
+									Cell cC = world.getCell(k, j);
+									if(cC != null){
+										Manager.TOTAL_FOOD-=Cell.MAX_FOOD;
+										cC.removeFood();
+									}
+								}
 							break;
 						default:
 							break;
@@ -167,8 +185,10 @@ public class AntPanel extends Application {
 				repaint();
 				RightPanel.data[0].setYValue(Manager.NESTED_FOOD);
 				RightPanel.data[1].setYValue(Manager.TOTAL_FOOD);
-				//da aggiungere un altro grafico o una label semplice
-				int media = Manager.TOTAL_TIME/Manager.TOTAL_ANTS_TO_NEST;
+				
+				//avg_time
+				RightPanel.pieData[0].setPieValue(Manager.TOTAL_TIME/Manager.TOTAL_ANTS_TO_NEST);
+				RightPanel.pieData[1].setPieValue(Manager.LAST_ANT_TO_NEST);
 				sleepQuietly(Manager.SLEEP_TIME);
 
 			}
@@ -221,7 +241,7 @@ public class AntPanel extends Application {
 				if (cell.getNumberOfAnts() > 0) {
 
 					gc.setGlobalAlpha(1.0);
-					gc.setFill(Color.RED);
+					gc.setFill(Color.BLACK);
 				}
 
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,

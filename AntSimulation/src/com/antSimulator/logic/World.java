@@ -1,20 +1,19 @@
 package com.antSimulator.logic;
 
-import java.awt.Point;
 import java.util.Random;
-import java.util.concurrent.ArrayBlockingQueue;
-import java.util.concurrent.BlockingQueue;
 
 public class World {
 
-	public static int NUM_OF_ANTS = 10;
-	public static final short MAX_NUM_OF_ANT = 100;
-	public static final int WIDTH = 70;
-	public static final int HEIGHT = 70;
-	public static final int FOOD_WIDTH = 5;
-	public static final int FOOD_HEIGHT = 5;
+	public static int NUM_OF_ANTS = 100;
+	public static final short MAX_NUM_OF_ANT = 500;
+	
+	public static final int WIDTH = 100;
+	public static final int HEIGHT = 100;
+	public static int FOOD_WIDTH = 1;
+	public static int FOOD_HEIGHT = 1;
 	public static final int NEST_WIDTH = 6;
 	public static final int NEST_HEIGHT = 6;
+	
 	public static final short MAX_PH_LEVEL = 1000;
 
 	private Cell[][] matrix;
@@ -52,7 +51,6 @@ public class World {
 
 				Ant a = nest.removeLastAnt();
 				this.matrix[a.getXPos()][a.getYPos()].removeAntfromArray();
-				;
 			}
 
 		}
@@ -70,9 +68,6 @@ public class World {
 
 		nest = new Nest(10, 15, matrix[10][15].getGroundState());
 		initFood();
-		// food = new ArrayList<Point>();
-		// food.add(new Point(45, 20));
-		// food.add(new Point(10, 40));
 
 	}
 

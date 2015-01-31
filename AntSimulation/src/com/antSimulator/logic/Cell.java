@@ -1,12 +1,8 @@
 package com.antSimulator.logic;
 
-import java.util.HashMap;
-
-import com.sun.javafx.tk.quantum.UploadingPainter;
-
 public class Cell {
 
-	public static final int MAX_FOOD = 10;
+	public static final int MAX_FOOD = 1000;
 	public static final int ANT_CAPACITY = 10;
 
 	private GroundState groundState;

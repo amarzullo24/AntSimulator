@@ -1,18 +1,16 @@
 package com.antSimulator.logic;
 
-import java.awt.Point;
 import java.util.ArrayList;
 import java.util.Random;
 import java.util.concurrent.locks.Condition;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
-import com.antSimulator.gui.RightPanel;
 
 public class Manager {
 
 	public static int PHREDUCTION = 10;
-	public static int UPDATE_TIME = 250;
+	public static int UPDATE_TIME = 100;
 
 	public static final int CORE_NUMBER = 3;
 	public static boolean ISACTIVE = true;
@@ -27,10 +25,12 @@ public class Manager {
 
 	public static short TOTAL_TIME = 0;
 	public static short TOTAL_ANTS_TO_NEST = 1;
+	public static short LAST_ANT_TO_NEST = 0;
 
-	public static short TOTAL_FOOD = World.FOOD_WIDTH * World.FOOD_HEIGHT
-			* Cell.MAX_FOOD;
+	public static int TOTAL_FOOD = World.FOOD_WIDTH * World.FOOD_HEIGHT * Cell.MAX_FOOD;
 	public static short NESTED_FOOD = 0;
+	
+	public static int GROUND_RADIOUS = 2;
 
 	public static Manager getInstance() {
 
@@ -349,9 +349,9 @@ public class Manager {
 	private void transaction(Ant a, Cell oldWhereGo) {
 
 		a.stepOfRoundtrip++;
+		
 		Cell current = world.getCellToDraw(a.getXPos(), a.getYPos());
-		Cell whereGo = world
-				.getCellToDraw(oldWhereGo.getX(), oldWhereGo.getY());
+		Cell whereGo = world.getCellToDraw(oldWhereGo.getX(), oldWhereGo.getY());
 		if (a.getLevel() == whereGo.getGroundState().getLevel()) {
 
 			a.setXPos(whereGo.getX());
@@ -359,7 +359,7 @@ public class Manager {
 
 			if (a.getAntState() == Ant.SEARCH) {
 				whereGo.getGroundState().increaseSearchPh(a);
-				// diffusePheromones(current.getGroundState(), a);
+				//diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
 
 				if (whereGo.getFood() > 0) {
@@ -373,7 +373,7 @@ public class Manager {
 				}
 			} else if (a.getAntState() == Ant.FOUND) {
 				whereGo.getGroundState().increaseFoundPh(a);
-				// diffusePheromones(current.getGroundState(), a);
+				//diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
 				if (nested(a.getXPos(), a.getYPos())) {
 					a.setMaxPheromones();
@@ -384,6 +384,7 @@ public class Manager {
 					NESTED_FOOD += Cell.ANT_CAPACITY;
 					TOTAL_TIME += a.stepOfRoundtrip;
 					TOTAL_ANTS_TO_NEST++;
+					LAST_ANT_TO_NEST = a.stepOfRoundtrip;
 					a.stepOfRoundtrip = 0;
 					Observer.getIstance().update();
 				}
@@ -413,15 +414,17 @@ public class Manager {
 		updating = true;
 		for (int i = 0; i < World.WIDTH; i++) {
 			for (int j = 0; j < World.HEIGHT; j++) {
-				float currentPhFound = world.getCell(i, j).getGroundState()
-						.getFoundPhLevel();
-				float currentPhSearch = world.getCell(i, j).getGroundState()
-						.getSearchPhLevel();
-				world.getCellToDraw(i, j).resetPheromones(currentPhFound,
-						currentPhSearch);
-				world.getCellToDraw(i, j).setNumberOfAnts(
-						world.getCell(i, j).getNumberOfAnts());
+				
+				float currentPhFound = world.getCell(i, j).getGroundState().getFoundPhLevel();
+				float currentPhSearch = world.getCell(i, j).getGroundState().getSearchPhLevel();
+				int currentFood = world.getCell(i, j).getFood();
+				int currentGround = world.getCell(i, j).getGroundState().getLevel();
+				
+				world.getCellToDraw(i, j).resetPheromones(currentPhFound,currentPhSearch);
+				world.getCellToDraw(i, j).setNumberOfAnts(world.getCell(i, j).getNumberOfAnts());
 				world.getCellToDraw(i, j).decreaseCellPheromones(PHREDUCTION);
+				world.getCellToDraw(i, j).setFood(currentFood);
+				world.getCellToDraw(i, j).getGroundState().setLevel(currentGround);
 			}
 
 		}

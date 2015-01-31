@@ -12,7 +12,7 @@ public class Ant {
 
 	public static final int SEARCH = 5;
 	public static final int FOUND = 6;
-	public static final int PHDESEASE = 10;
+	public static final int PHDESEASE = 5;
 	public static final int MAXPHEROMONE = 500;
 
 	// public static final String RESEARCHPHEROMONE = "researchPheromone";
