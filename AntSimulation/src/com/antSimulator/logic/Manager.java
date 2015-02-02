@@ -30,7 +30,7 @@ public class Manager {
 
 	public static int TOTAL_FOOD = World.FOOD_WIDTH * World.FOOD_HEIGHT * Cell.MAX_FOOD;
 	public static short NESTED_FOOD = 0;
-	
+
 	public static int GROUND_RADIOUS = 2;
 	public static boolean ITS_RAINING = false;
 
@@ -321,7 +321,7 @@ public class Manager {
 		int ph = 0;
 		if (world.getCell(dx, dy) != null)
 			ph = (int) world.getCell(dx, dy).getGroundState()
-					.getSearchPhLevel();
+			.getSearchPhLevel();
 
 		return ph;
 	}
@@ -353,20 +353,19 @@ public class Manager {
 		a.stepOfRoundtrip++;
 		if(a.onFire)
 			a.onFire_cont--;
-		
+
 		Cell current = world.getCellToDraw(a.getXPos(), a.getYPos());
-		Cell currentLogicMatrix = world.getCell(a.getXPos(), a.getYPos());
-		
 		Cell whereGo = world.getCellToDraw(oldWhereGo.getX(), oldWhereGo.getY());
+
 		if (a.getLevel() == whereGo.getGroundState().getLevel()) {
 
 			a.setXPos(whereGo.getX());
 			a.setYPos(whereGo.getY());
 
-			
+
 			if (a.getAntState() == Ant.SEARCH) {
 				whereGo.getGroundState().increaseSearchPh(a);
-				//diffusePheromones(current.getGroundState(), a);
+				diffusePheromones(current.getGroundState(), a);
 				a.releasePheromones();
 
 				if (whereGo.getFood() > 0) {
@@ -397,19 +396,19 @@ public class Manager {
 				}
 
 			}
-			
-			current.removeAntfromArray();
-			
 
-			
+			current.removeAntfromArray();
+
+
+
 			if(whereGo.onFire)
 				a.onFire = true;
 			else if(a.onFire && a.onFire_cont > 0)
 				whereGo.onFire = true;
-			
+
 			if(current.getNumberOfAnts() <= 0)
 				current.onFire = false;
-			
+
 			if((a.onFire_cont > 0 && a.onFire) || !a.onFire)
 				whereGo.insertAntInArray();
 
@@ -434,13 +433,13 @@ public class Manager {
 		updating = true;
 		for (int i = 0; i < World.WIDTH; i++) {
 			for (int j = 0; j < World.HEIGHT; j++) {
-				
+
 				float currentPhFound = world.getCell(i, j).getGroundState().getFoundPhLevel();
 				float currentPhSearch = world.getCell(i, j).getGroundState().getSearchPhLevel();
 				int currentFood = world.getCell(i, j).getFood();
 				int currentGround = world.getCell(i, j).getGroundState().getLevel();
 				boolean onFire = world.getCell(i, j).onFire;
-				
+
 				world.getCellToDraw(i, j).resetPheromones(currentPhFound,currentPhSearch);
 				world.getCellToDraw(i, j).setNumberOfAnts(world.getCell(i, j).getNumberOfAnts());
 				world.getCellToDraw(i, j).decreaseCellPheromones(PHREDUCTION);
@@ -450,9 +449,9 @@ public class Manager {
 			}
 
 		}
-		
+
 		ArrayList<Integer> index = new ArrayList<Integer>();
-		
+
 		int ik = 0;
 		for (Ant a : world.getNest().getAnts()) {
 			moveAnts(a);
@@ -460,7 +459,7 @@ public class Manager {
 				index.add(ik);
 			ik++;		
 		}
-		
+
 		world.nest.removeAntsUsingXY(index);
 		world.setUpdated(!world.isUpdated());
 		updating = false;
@@ -471,11 +470,46 @@ public class Manager {
 
 	private void diffusePheromones(GroundState groundState, Ant a) {
 		ArrayList<Cell> neighbour = getNeighbour(a.getXPos(), a.getYPos());
+
+		boolean check = false;
+		int media =  0;
+
+		while(!check && neighbour.size() != 0){
+			
+			check = true;
+			int inamovibile = 0;
+
+			for (Cell c : neighbour) {
+
+				inamovibile += c.getGroundState().getLevel(); 
+			}
+
+			media = ((a.getCurrentPH()) + inamovibile)/neighbour.size();
+
+			ArrayList<Integer> index = new ArrayList<Integer>();
+
+			int i = 0;
+			for (Cell c : neighbour) {
+
+				if(c.getGroundState().getLevel() >= media)
+					index.add(i);
+
+				i++;
+			}
+
+			int ik = 0;
+			for (Integer ind : index) {
+
+				neighbour.remove((int)ind+ik);
+				ik--;
+				check = false;
+			}
+			
+		}
+		
 		for (Cell c : neighbour) {
-			if (a.getAntState() == Ant.FOUND)
-				c.getGroundState().increaseNeigFoundPh(a);
-			else
-				c.getGroundState().increaseNeigSearchPh(a);
+
+			c.getGroundState().setSearchPhLevel(c.getGroundState().getSearchPhLevel() + media);
 		}
 
 	}

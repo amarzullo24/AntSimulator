@@ -44,8 +44,8 @@ public class AntPanel extends Application {
 	
 	private Image img = new Image("javafx.png");
 
-	public int cursorX = 0;
-	public int cursorY = 0;
+	public double cursorX = 0;
+	public double cursorY = 0;
 
 	public AntPanel() {
 		world = Manager.getInstance().world;
@@ -195,8 +195,8 @@ public class AntPanel extends Application {
 						}
 					}
 					
-					cursorX = currentX;
-					cursorY = currentY;
+					cursorX = e.getX();
+					cursorY = e.getY();
 					
 					break;
 				default:
