@@ -6,6 +6,7 @@ import java.util.ArrayList;
 public class Nest {
 	
 
+	private static final int MAX_ONFIRE_CONT = 5;
 	private int xPos;
 	private int yPos;
 	private GroundState groundState;
@@ -63,6 +64,27 @@ public class Nest {
 	public Ant removeLastAnt() {
 		Ant a=ants.remove(ants.size()-1);
 		return a;
+	}
+	
+	public void removeAntsUsingXY(ArrayList<Integer> index){
+		
+		int i = 0;
+		for (Integer ind : index) {
+			
+			ants.remove((int)ind+i);
+			i--;
+		}
+		
+	}
+
+	public void setAntsOnFireUsingXY(int currentX, int currentY) {
+		
+		for (Ant ant : ants) {
+			if(ant.getXPos() == currentX && ant.getYPos() == currentY)
+				ant.onFire = true;
+			    ant.onFire_cont = Nest.MAX_ONFIRE_CONT;
+		}
+		
 	}
 
 

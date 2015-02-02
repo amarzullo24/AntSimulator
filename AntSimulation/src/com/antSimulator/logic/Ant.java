@@ -14,6 +14,9 @@ public class Ant {
 	public static final int FOUND = 6;
 	public static final int PHDESEASE = 5;
 	public static final int MAXPHEROMONE = 500;
+	
+	public int onFire_cont = 0;
+	public boolean onFire = false;
 
 	// public static final String RESEARCHPHEROMONE = "researchPheromone";
 	// public static final String FOUNDPHEROMONE = "foundPheromone";

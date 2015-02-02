@@ -351,14 +351,19 @@ public class Manager {
 	private void transaction(Ant a, Cell oldWhereGo) {
 
 		a.stepOfRoundtrip++;
+		if(a.onFire)
+			a.onFire_cont--;
 		
 		Cell current = world.getCellToDraw(a.getXPos(), a.getYPos());
+		Cell currentLogicMatrix = world.getCell(a.getXPos(), a.getYPos());
+		
 		Cell whereGo = world.getCellToDraw(oldWhereGo.getX(), oldWhereGo.getY());
 		if (a.getLevel() == whereGo.getGroundState().getLevel()) {
 
 			a.setXPos(whereGo.getX());
 			a.setYPos(whereGo.getY());
 
+			
 			if (a.getAntState() == Ant.SEARCH) {
 				whereGo.getGroundState().increaseSearchPh(a);
 				//diffusePheromones(current.getGroundState(), a);
@@ -392,8 +397,21 @@ public class Manager {
 				}
 
 			}
+			
 			current.removeAntfromArray();
-			whereGo.insertAntInArray();
+			
+
+			
+			if(whereGo.onFire)
+				a.onFire = true;
+			else if(a.onFire && a.onFire_cont > 0)
+				whereGo.onFire = true;
+			
+			if(current.getNumberOfAnts() <= 0)
+				current.onFire = false;
+			
+			if((a.onFire_cont > 0 && a.onFire) || !a.onFire)
+				whereGo.insertAntInArray();
 
 		} else if (a.getLevel() < whereGo.getGroundState().getLevel())
 			a.setLevel(a.getLevel() + 1);
@@ -421,18 +439,29 @@ public class Manager {
 				float currentPhSearch = world.getCell(i, j).getGroundState().getSearchPhLevel();
 				int currentFood = world.getCell(i, j).getFood();
 				int currentGround = world.getCell(i, j).getGroundState().getLevel();
+				boolean onFire = world.getCell(i, j).onFire;
 				
 				world.getCellToDraw(i, j).resetPheromones(currentPhFound,currentPhSearch);
 				world.getCellToDraw(i, j).setNumberOfAnts(world.getCell(i, j).getNumberOfAnts());
 				world.getCellToDraw(i, j).decreaseCellPheromones(PHREDUCTION);
 				world.getCellToDraw(i, j).setFood(currentFood);
 				world.getCellToDraw(i, j).getGroundState().setLevel(currentGround);
+				world.getCellToDraw(i, j).onFire = onFire;
 			}
 
 		}
+		
+		ArrayList<Integer> index = new ArrayList<Integer>();
+		
+		int ik = 0;
 		for (Ant a : world.getNest().getAnts()) {
 			moveAnts(a);
+			if(a.onFire && a.onFire_cont<=0)
+				index.add(ik);
+			ik++;		
 		}
+		
+		world.nest.removeAntsUsingXY(index);
 		world.setUpdated(!world.isUpdated());
 		updating = false;
 		condition.signalAll();

@@ -10,6 +10,7 @@ public class Cell {
 	private int food;
 	private int x;
 	private int y;
+	public boolean onFire = false;
 
 	public Cell(int x, int y, int level) {
 		this.setX(x);

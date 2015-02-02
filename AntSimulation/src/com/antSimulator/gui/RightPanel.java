@@ -60,7 +60,7 @@ public class RightPanel implements Observed{
 
 		box = VBoxBuilder.create().id(RIGHTLAYOUT).build();
 		box.setSpacing(10);
-		box.setPrefSize(450, 600);
+		box.setPrefSize(550, 650);
 		box.setAlignment(Pos.CENTER);
 
 		slider_box = new VBox();
@@ -233,6 +233,7 @@ public class RightPanel implements Observed{
 		RadioButton removeFoodButton = new RadioButton("Remove Food");
 		RadioButton modifyButton = new RadioButton("Modify Ground");
 		RadioButton moveNestButton = new RadioButton("Move Nest");
+		RadioButton fireButton = new RadioButton("Fire");
 		
 		addFoodButton.setToggleGroup(group);
 		addFoodButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
@@ -285,13 +286,25 @@ public class RightPanel implements Observed{
 			}
 		});
 		
+		fireButton.setToggleGroup(group);
+		fireButton.selectedProperty().addListener(new ChangeListener<Boolean>() {
+
+			@Override
+			public void changed(ObservableValue<? extends Boolean> arg0,
+					Boolean arg1, Boolean newVal) {
+				if(newVal)
+					AntPanel.currentButtonSelection=AntPanel.KILLANTS;
+
+			}
+		});
+		
 		slider_box.setSpacing(10);
 		slider_box.setAlignment(Pos.CENTER_LEFT);
 		antbox.setSpacing(10);
 		stepbox.setSpacing(10);
 		buttonbox.setSpacing(10);
 
-		buttonbox.getChildren().addAll(addFoodButton, removeFoodButton,modifyButton,moveNestButton);
+		buttonbox.getChildren().addAll(addFoodButton, removeFoodButton,modifyButton,moveNestButton,fireButton);
 		
 		box.getChildren().addAll(antbox, stepbox, buttonbox);
 

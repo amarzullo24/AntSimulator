@@ -1,5 +1,7 @@
 package com.antSimulator.gui;
 
+import java.util.Random;
+
 import javafx.animation.AnimationTimer;
 import javafx.application.Application;
 import javafx.application.Platform;
@@ -8,6 +10,7 @@ import javafx.scene.Group;
 import javafx.scene.Scene;
 import javafx.scene.canvas.Canvas;
 import javafx.scene.canvas.GraphicsContext;
+import javafx.scene.image.Image;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.paint.Color;
@@ -30,6 +33,7 @@ public class AntPanel extends Application {
 	public static final String DELETEFOOD = "DeleteFood";
 	public static final String MODIFYLEVEL = "ModifyLevel";
 	public static final String MOVENEST = "MoveNest";
+	public static final String KILLANTS = "Killants";
 
 	private World world;
 	private Group root;
@@ -37,8 +41,12 @@ public class AntPanel extends Application {
 	private Canvas canvas;
 	private GraphicsContext gc;
 	public static String currentButtonSelection;
-
 	
+	private Image img = new Image("javafx.png");
+
+	public int cursorX = 0;
+	public int cursorY = 0;
+
 	public AntPanel() {
 		world = Manager.getInstance().world;
 		currentButtonSelection = MODIFYLEVEL;
@@ -90,98 +98,113 @@ public class AntPanel extends Application {
 		// Clear away portions as the user drags the mouse
 		canvas.addEventHandler(MouseEvent.MOUSE_DRAGGED,
 				new EventHandler<MouseEvent>() {
-					@Override
-					public void handle(MouseEvent e) {
+			@Override
+			public void handle(MouseEvent e) {
 
-						int currentX = (int) (e.getX() / CELLSIZE);
-						int currentY = (int) (e.getY() / CELLSIZE);
+				int currentX = (int) (e.getX() / CELLSIZE);
+				int currentY = (int) (e.getY() / CELLSIZE);
 
-						Cell currentCell = world.getCell(currentX, currentY);
+				Cell currentCell = world.getCell(currentX, currentY);
 
-						if (currentCell == null)
-							return;
+				if (currentCell == null)
+					return;
 
-						switch (currentButtonSelection) {
-						case MODIFYLEVEL:
-							@SuppressWarnings("unused")
-							int currentLevel = currentCell.increaseGroundLevel();
+				switch (currentButtonSelection) {
+				case MODIFYLEVEL:
+					@SuppressWarnings("unused")
+					int currentLevel = currentCell.increaseGroundLevel();
 
-							int i = 1;
-							while (i < Manager.GROUND_RADIOUS) {
+					int i = 1;
+					while (i < Manager.GROUND_RADIOUS) {
 
-								for (int j = currentX - i; j <= currentX + i; j++) {
+						for (int j = currentX - i; j <= currentX + i; j++) {
 
-									currentCell = world
-											.getCell(j, currentY - i);
-									if (currentCell != null) {
-										currentLevel = currentCell.increaseGroundLevel();
-										}
-
-									currentCell = world
-											.getCell(j, currentY + i);
-									if (currentCell != null) {
-										currentLevel = currentCell.increaseGroundLevel();
-									}
-								}
-
-								for (int j = currentY - i; j <= currentY + i; j++) {
-
-									currentCell = world
-											.getCell(currentX - i, j);
-									if (currentCell != null) {
-										currentLevel = currentCell.increaseGroundLevel();
-									}
-
-									currentCell = world
-											.getCell(currentX + i, j);
-									if (currentCell != null) {
-										currentLevel = currentCell.increaseGroundLevel();
-									}
-								}
-
-								i++;
+							currentCell = world
+									.getCell(j, currentY - i);
+							if (currentCell != null) {
+								currentLevel = currentCell.increaseGroundLevel();
 							}
-							break;
-						case ADDFOOD:
-							
-							for(int k = currentX; k<= currentX + World.FOOD_WIDTH; k++)
-								for(int j = currentY; j<=currentY + World.FOOD_HEIGHT; j++)
-								{
-									Cell cC = world.getCell(k, j);
-									if(cC != null){
-										Manager.TOTAL_FOOD+=Cell.MAX_FOOD;
-										cC.insertFood();
-									}
-								}
 
-							break;
-						case DELETEFOOD:
-							
-							for(int k = currentX; k<= currentX + World.FOOD_WIDTH; k++)
-								for(int j = currentY; j<=currentY + World.FOOD_HEIGHT; j++)
-								{
-									Cell cC = world.getCell(k, j);
-									if(cC != null){
-										Manager.TOTAL_FOOD-=Cell.MAX_FOOD;
-										cC.removeFood();
-									}
-								}
-							break;
-						case MOVENEST:
-							
-							if(currentX >= World.NESTX - 5 && currentX <= World.NESTX + World.NEST_WIDTH && 
-							   currentY >= World.NESTY - 5 && currentY <= World.NESTY + World.NEST_HEIGHT){
-								World.NESTX = currentX;
-								World.NESTY = currentY;
-								Manager.getInstance().world.nest.setxPos(currentX);
-								Manager.getInstance().world.nest.setyPos(currentY);
+							currentCell = world
+									.getCell(j, currentY + i);
+							if (currentCell != null) {
+								currentLevel = currentCell.increaseGroundLevel();
 							}
-						default:
-							break;
 						}
 
+						for (int j = currentY - i; j <= currentY + i; j++) {
+
+							currentCell = world
+									.getCell(currentX - i, j);
+							if (currentCell != null) {
+								currentLevel = currentCell.increaseGroundLevel();
+							}
+
+							currentCell = world
+									.getCell(currentX + i, j);
+							if (currentCell != null) {
+								currentLevel = currentCell.increaseGroundLevel();
+							}
+						}
+
+						i++;
 					}
-				});
+					break;
+				case ADDFOOD:
+
+					for(int k = currentX; k<= currentX + World.FOOD_WIDTH; k++)
+						for(int j = currentY; j<=currentY + World.FOOD_HEIGHT; j++)
+						{
+							Cell cC = world.getCell(k, j);
+							if(cC != null){
+								Manager.TOTAL_FOOD+=Cell.MAX_FOOD;
+								cC.insertFood();
+							}
+						}
+
+					break;
+				case DELETEFOOD:
+
+					for(int k = currentX; k<= currentX + World.FOOD_WIDTH; k++)
+						for(int j = currentY; j<=currentY + World.FOOD_HEIGHT; j++)
+						{
+							Cell cC = world.getCell(k, j);
+							if(cC != null){
+								Manager.TOTAL_FOOD-=Cell.MAX_FOOD;
+								cC.removeFood();
+							}
+						}
+					break;
+				case MOVENEST:
+
+					if(currentX >= World.NESTX - 5 && currentX <= World.NESTX + World.NEST_WIDTH && 
+					currentY >= World.NESTY - 5 && currentY <= World.NESTY + World.NEST_HEIGHT){
+						World.NESTX = currentX;
+						World.NESTY = currentY;
+						Manager.getInstance().world.nest.setxPos(currentX);
+						Manager.getInstance().world.nest.setyPos(currentY);
+					}
+					break;
+					
+				case KILLANTS:
+					
+					for(int l=currentX; l<currentX + 5; l++){
+						for(int j = currentY; j<currentY + 5; j++){
+							
+							Manager.getInstance().world.nest.setAntsOnFireUsingXY(l, j);
+						}
+					}
+					
+					cursorX = currentX;
+					cursorY = currentY;
+					
+					break;
+				default:
+					break;
+				}
+
+			}
+		});
 
 	}
 
@@ -195,7 +218,7 @@ public class AntPanel extends Application {
 				repaint();
 				RightPanel.data[0].setYValue(Manager.NESTED_FOOD);
 				RightPanel.data[1].setYValue(Manager.TOTAL_FOOD);
-				
+
 				//avg_time
 				RightPanel.pieData[0].setPieValue(Manager.TOTAL_TIME/Manager.TOTAL_ANTS_TO_NEST);
 				RightPanel.pieData[1].setPieValue(Manager.LAST_ANT_TO_NEST);
@@ -217,12 +240,27 @@ public class AntPanel extends Application {
 	private void repaint() {
 
 		gc.clearRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
-		
+
 		if(Manager.ITS_RAINING){
-			gc.setFill(Color.STEELBLUE);
+			gc.setFill(Color.TAN);
 			gc.fillRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
+			gc.setFill(Color.STEELBLUE);
+
+			for(int k = 0; k<= 10; k++){
+				int i = new Random().nextInt(World.WIDTH);
+				int j = new Random().nextInt(World.HEIGHT);
+
+				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE*3,
+						CELLSIZE*3, 10, 10);
+			}
+
 		}
 		
+		if(currentButtonSelection.equals(KILLANTS)){
+			
+			gc.drawImage(img, cursorX, cursorY);
+		}
+
 		gc.strokeRect(0, 0, PANEL_SIZE_X, PANEL_SIZE_Y);
 
 		Manager.getInstance().lock.lock();
@@ -257,11 +295,15 @@ public class AntPanel extends Application {
 
 					gc.setGlobalAlpha(1.0);
 					gc.setFill(Color.BLACK);
+					
+					if(cell.onFire)
+						gc.setFill(Color.RED);
+					 
 				}
 
 				gc.fillRoundRect(i * CELLSIZE, j * CELLSIZE, CELLSIZE,
 						CELLSIZE, 10, 10);
-				
+
 
 			}// for
 
@@ -271,7 +313,7 @@ public class AntPanel extends Application {
 		gc.fillRoundRect(world.getNest().getxPos() * CELLSIZE, world.getNest()
 				.getyPos() * CELLSIZE, CELLSIZE * World.NEST_WIDTH, CELLSIZE
 				* World.NEST_HEIGHT, 10, 10);
-		
+
 		Manager.getInstance().lock.unlock();
 	}// repaint
 
